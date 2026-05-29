@@ -157,9 +157,13 @@ nav {
 /* ── SECTION ── */
 .section {
   position: relative; z-index: 1;
-  padding: 32px 48px 60px;
+  width: 100%;
+  padding: 32px 0 60px;
+}
+.section-inner {
   max-width: 1100px;
   margin: 0 auto;
+  padding: 0 48px;
 }
 
 .section-label {
@@ -352,11 +356,11 @@ footer span { color: var(--amber); }
       <path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </a>
-  </div>
 </section>
 
 <!-- SIMULADORES -->
 <section class="section">
+  <div class="section-inner">
   <div class="section-label">Ferramentas disponíveis</div>
   <h2 class="section-title">Simuladores</h2>
   <p class="section-sub">Modelos interativos com exportação em Excel. Cada um resolve uma dúvida real.</p>
@@ -389,6 +393,7 @@ footer span { color: var(--amber); }
       <div class="soon-sub">Comparativo entre as duas aplicações mais comuns do caixa corporativo, considerando liquidez, IR e rentabilidade líquida.</div>
     </div>
 
+  </div>
   </div>
 </section>
 
