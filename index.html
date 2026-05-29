@@ -6,6 +6,16 @@
 <title>Conta com Nico · Lab Financeiro</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
+  @keyframes pageIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+<style>
+  @keyframes pageOut { to { opacity:0; transform:translateY(-8px); } }
+  .page-leaving { animation: pageOut .25s ease forwards; pointer-events:none; }
+</style>
+<style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -418,4 +428,14 @@ footer span { color: var(--amber); }
 </footer>
 
 </body>
+<script>
+document.querySelectorAll('a.sim-card').forEach(function(link) {
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    var href = this.href;
+    document.body.classList.add('page-leaving');
+    setTimeout(function(){ window.location.href = href; }, 250);
+  });
+});
+</script>
 </html>
