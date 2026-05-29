@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Simulador CP x LP: Qual estratégia rende mais?</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  @keyframes pageIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  body { animation: pageIn .45s ease both; }
+</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 <style>
@@ -474,6 +481,18 @@ table.comp tr:last-child td { border-bottom: none; font-weight: 700; font-size: 
 
 <!-- HERO -->
 <div class="hero">
+  <!-- Back button aprimorado -->
+  <a href="../" style="
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'Poppins',sans-serif; font-size:12px; font-weight:600;
+    color:rgba(255,255,255,.55); text-decoration:none;
+    background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12);
+    padding:8px 16px; border-radius:100px; margin-bottom:24px;
+    transition:all .2s; letter-spacing:.3px;
+  " onmouseover="this.style.color='#fff';this.style.background='rgba(212,88,10,.2)';this.style.borderColor='rgba(212,88,10,.4)'"
+     onmouseout="this.style.color='rgba(255,255,255,.55)';this.style.background='rgba(255,255,255,.07)';this.style.borderColor='rgba(255,255,255,.12)'">
+    ← Lab Financeiro
+  </a>
   <div class="hero-eyebrow">Simulador de Renda Fixa</div>
   <h1 class="hero-title">A taxa maior <em>nem sempre</em> é o maior retorno</h1>
   <p class="hero-sub">Simule o impacto do IR regressivo antes de resgatar antecipadamente. Compare a estratégia de curto prazo + reinvestimento com manter o investimento até o vencimento.</p>
