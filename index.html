@@ -4,457 +4,937 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Conta com Nico · Lab Financeiro</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
 <style>
-  @keyframes pageIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-</style>
-<style>
-  @keyframes pageOut { to { opacity:0; transform:translateY(-8px); } }
-  .page-leaving { animation: pageOut .25s ease forwards; pointer-events:none; }
-</style>
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pageOut {
+  to { opacity: 0; transform: translateY(-8px); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .45; transform: scale(.82); }
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 :root {
   --midnight: #0D1B2A;
-  --navy:     #1E3A5F;
-  --steel:    #2D6A9F;
-  --steel-lt: #D4E4F0;
-  --amber:    #D4580A;
+  --navy: #1E3A5F;
+  --steel: #2D6A9F;
+  --amber: #D4580A;
   --amber-lt: #F0A06A;
-  --amber-pale: #FAD4B8;
-  --cloud:    #F5F7FA;
-  --border:   #E2E8F0;
-  --txt:      #0D1B2A;
-  --txt2:     #1E3A5F;
-  --txt3:     #8896A9;
+  --white: #FFFFFF;
+  --muted: rgba(255,255,255,.62);
+  --muted-2: rgba(255,255,255,.42);
+  --line: rgba(255,255,255,.09);
+  --card: rgba(255,255,255,.045);
+  --card-2: rgba(255,255,255,.03);
+  --shadow: 0 24px 80px rgba(0,0,0,.28);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   font-family: 'Poppins', sans-serif;
-  background: var(--midnight);
-  color: #fff;
+  background:
+    radial-gradient(circle at 76% 18%, rgba(212,88,10,.16), transparent 32%),
+    radial-gradient(circle at 12% 26%, rgba(45,106,159,.2), transparent 30%),
+    var(--midnight);
+  color: var(--white);
   min-height: 100vh;
   overflow-x: hidden;
+  animation: pageIn .45s ease both;
 }
 
-/* ── NOISE TEXTURE ── */
 body::before {
   content: '';
-  position: fixed; inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none; z-index: 0;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
 }
 
-/* ── NAV ── */
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 48px;
-  background: rgba(13,27,42,.85);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255,255,255,.06);
-}
-.nav-brand {
-  font-size: 15px; font-weight: 700; letter-spacing: -.3px;
-  color: #fff;
-}
-.nav-brand span { color: var(--amber); }
-.nav-tag {
-  font-size: 10px; font-weight: 600; letter-spacing: 2px;
-  text-transform: uppercase; color: var(--txt3);
+a {
+  color: inherit;
 }
 
-/* ── HERO ── */
-.hero {
-  position: relative; z-index: 1;
-  min-height: auto;
-  display: flex; flex-direction: column;
-  align-items: flex-start; justify-content: center;
-  text-align: left;
-  padding: 110px 0 32px;
-}
-
-/* Glow de fundo */
-.hero::after {
-  content: '';
-  position: absolute;
-  width: 600px; height: 600px;
-  background: radial-gradient(circle, rgba(212,88,10,.15) 0%, transparent 70%);
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
+.page-leaving {
+  animation: pageOut .25s ease forwards;
   pointer-events: none;
 }
 
-.hero-eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(212,88,10,.12);
-  border: 1px solid rgba(212,88,10,.3);
-  border-radius: 100px;
-  padding: 6px 16px;
-  font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
-  text-transform: uppercase; color: var(--amber-lt);
-  margin-bottom: 28px;
-  animation: fadeUp .6s ease both;
+.container {
+  width: min(1120px, calc(100% - 96px));
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 16px 48px;
+  background: rgba(13,27,42,.84);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+
+.nav-brand {
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 850;
+  letter-spacing: -.4px;
+  white-space: nowrap;
+}
+
+.nav-brand span {
+  color: var(--amber);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: rgba(255,255,255,.6);
+  font-size: 12px;
+  font-weight: 650;
+  transition: color .15s ease;
+}
+
+.nav-links a:hover {
+  color: #fff;
+}
+
+.nav-cta {
+  text-decoration: none;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  border-radius: 10px;
+  background: rgba(212,88,10,.14);
+  border: 1px solid rgba(212,88,10,.34);
+  color: var(--amber-lt);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* SHARED */
+.section {
+  position: relative;
+  z-index: 1;
+  padding: 72px 0;
+}
+
+.section-top {
+  max-width: 760px;
+  margin-bottom: 28px;
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--amber-lt);
+  text-transform: uppercase;
+  letter-spacing: 1.7px;
+  font-size: 11px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.section-label::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 10px rgba(212,88,10,.8);
+}
+
+.section-title {
+  font-size: clamp(28px, 3vw, 42px);
+  line-height: 1.08;
+  font-weight: 850;
+  letter-spacing: -1.5px;
+  margin-bottom: 12px;
+}
+
+.section-sub {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+/* HERO */
+.hero {
+  position: relative;
+  z-index: 1;
+  min-height: 88vh;
+  display: flex;
+  align-items: center;
+  padding: 112px 0 58px;
+}
+
+.hero-inner {
+  max-width: 900px;
+  animation: fadeUp .55s ease both;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: rgba(212,88,10,.12);
+  border: 1px solid rgba(212,88,10,.32);
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: var(--amber-lt);
+  margin-bottom: 24px;
+}
+
 .hero-eyebrow::before {
   content: '';
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--amber); flex-shrink: 0;
-  box-shadow: 0 0 6px var(--amber);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 8px var(--amber);
   animation: pulse 2s infinite;
-}
-@keyframes pulse {
-  0%,100% { opacity: 1; } 50% { opacity: .4; }
 }
 
 .hero-title {
-  font-size: clamp(24px, 3.5vw, 42px);
+  font-size: clamp(42px, 6.2vw, 82px);
+  line-height: .98;
   font-weight: 900;
-  line-height: 1.05;
-  letter-spacing: -2px;
-  color: #fff;
-  margin-bottom: 16px;
-  animation: fadeUp .6s .1s ease both;
+  letter-spacing: -3.6px;
+  margin-bottom: 24px;
 }
+
 .hero-title em {
   font-style: normal;
   color: var(--amber);
 }
 
 .hero-sub {
-  max-width: 640px;
-  font-size: 14px; font-weight: 400; line-height: 1.7;
-  color: rgba(255,255,255,.5);
-  margin-bottom: 28px;
-  animation: fadeUp .6s .2s ease both;
+  max-width: 740px;
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.75;
+  color: rgba(255,255,255,.66);
+  margin-bottom: 30px;
 }
 
-.hero-cta {
-  display: inline-flex; align-items: center; gap: 10px;
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 850;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
+}
+
+.btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-primary {
   background: var(--amber);
   color: #fff;
-  font-family: 'Poppins', sans-serif;
-  font-size: 14px; font-weight: 700;
-  padding: 14px 28px;
-  border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(212,88,10,.34);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 44px rgba(212,88,10,.44);
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.11);
+  color: rgba(255,255,255,.82);
+}
+
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,.2);
+  background: rgba(255,255,255,.07);
+}
+
+/* TOOLS */
+.tools {
+  padding-top: 32px;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: 1.35fr .65fr;
+  gap: 18px;
+}
+
+.tool-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 350px;
+  display: flex;
+  flex-direction: column;
   text-decoration: none;
-  box-shadow: 0 8px 24px rgba(212,88,10,.35);
-  transition: transform .15s, box-shadow .15s;
-  animation: fadeUp .6s .3s ease both;
-}
-.hero-cta:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(212,88,10,.45); }
-.hero-cta svg { width: 16px; height: 16px; }
-
-  50%  { transform: scaleY(1); transform-origin: top; }
-  51%  { transform: scaleY(1); transform-origin: bottom; }
-  100% { transform: scaleY(0); transform-origin: bottom; }
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 24px;
+  background:
+    linear-gradient(145deg, rgba(30,58,95,.68), rgba(255,255,255,.035)),
+    rgba(255,255,255,.045);
+  box-shadow: var(--shadow);
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
 }
 
-/* ── SECTION ── */
-.section {
-  position: relative; z-index: 1;
-  width: 100%;
-  padding: 32px 0 60px;
-}
-.section-inner {
-  width: 100%;
-  padding: 0 48px;
+.tool-card::after {
+  content: '';
+  position: absolute;
+  right: -90px;
+  bottom: -130px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(212,88,10,.22), transparent 70%);
+  pointer-events: none;
 }
 
-.section-label {
-  font-size: 11px; font-weight: 600; letter-spacing: 2px;
-  text-transform: uppercase; color: var(--amber);
+.tool-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(212,88,10,.46);
+  box-shadow: 0 28px 76px rgba(0,0,0,.32), 0 0 0 1px rgba(212,88,10,.1);
+}
+
+.tool-header {
+  padding: 30px;
+  position: relative;
+  z-index: 1;
+}
+
+.tool-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(212,88,10,.14);
+  border: 1px solid rgba(212,88,10,.28);
+  color: var(--amber-lt);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  border-radius: 999px;
+  margin-bottom: 18px;
+}
+
+.tool-tag::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--amber);
+}
+
+.tool-title {
+  font-size: clamp(27px, 3vw, 38px);
+  line-height: 1.08;
+  letter-spacing: -1.2px;
+  font-weight: 880;
   margin-bottom: 12px;
 }
-.section-title {
-  font-size: 32px; font-weight: 800; letter-spacing: -1px;
-  color: #fff; margin-bottom: 8px;
-}
-.section-sub {
-  font-size: 14px; color: rgba(255,255,255,.45);
-  margin-bottom: 28px; line-height: 1.7;
+
+.tool-sub {
+  max-width: 620px;
+  color: rgba(255,255,255,.6);
+  font-size: 14px;
+  line-height: 1.75;
 }
 
-/* ── CARDS GRID ── */
-
-/* ── MAIN LAYOUT ── */
-.main-layout {
-  position: relative; z-index: 1;
-  min-height: calc(100vh - 60px);
-  display: flex; align-items: center;
-  padding: 80px 0 40px;
-}
-.main-inner {
-  width: 100%;
-  padding: 0 48px;
+.tool-list {
   display: grid;
-  grid-template-columns: 1fr 1.6fr;
+  gap: 10px;
+  padding: 0 30px 30px;
+  position: relative;
+  z-index: 1;
+}
+
+.tool-list div {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: rgba(255,255,255,.64);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.tool-list div::before {
+  content: '✓';
+  color: var(--amber-lt);
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.tool-footer {
+  margin-top: auto;
+  padding: 22px 30px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  position: relative;
+  z-index: 1;
+}
+
+.tool-cta {
+  color: var(--amber-lt);
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.tool-arrow {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: rgba(212,88,10,.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s ease;
+}
+
+.tool-arrow svg {
+  width: 17px;
+  height: 17px;
+  color: var(--amber-lt);
+}
+
+.tool-card:hover .tool-arrow {
+  background: var(--amber);
+}
+
+.tool-card:hover .tool-arrow svg {
+  color: #fff;
+}
+
+.soon-card {
+  min-height: 350px;
+  border: 1px dashed rgba(255,255,255,.15);
+  border-radius: 24px;
+  padding: 26px;
+  background: rgba(255,255,255,.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.soon-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.08);
+  color: rgba(255,255,255,.48);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  border-radius: 999px;
+  margin-bottom: 18px;
+}
+
+.soon-title {
+  font-size: 22px;
+  line-height: 1.18;
+  font-weight: 850;
+  letter-spacing: -.7px;
+  margin-bottom: 10px;
+}
+
+.soon-sub {
+  color: rgba(255,255,255,.45);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.soon-link {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  color: var(--amber-lt);
+  font-size: 13px;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.soon-link:hover {
+  text-decoration: underline;
+}
+
+/* ABOUT */
+.about {
+  background: rgba(255,255,255,.032);
+  border-top: 1px solid rgba(255,255,255,.07);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
   gap: 48px;
   align-items: center;
 }
-.col-hero {
-  display: flex; flex-direction: column;
-  align-items: flex-start;
-}
-.col-cards {
-  display: flex; flex-direction: column;
-  gap: 12px;
-}
-.col-cards .section-label { margin-bottom: 8px; }
 
-.cards-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+.profile-card {
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 24px;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 86% 8%, rgba(212,88,10,.17), transparent 40%),
+    rgba(255,255,255,.04);
+}
+
+.profile-avatar {
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--navy), var(--steel));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  font-weight: 900;
+  border: 2px solid rgba(212,88,10,.45);
+  margin-bottom: 18px;
+}
+
+.profile-name {
+  font-size: 18px;
+  font-weight: 850;
+  margin-bottom: 6px;
+}
+
+.profile-role {
+  color: rgba(255,255,255,.5);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.about-text h2 {
+  font-size: clamp(28px, 3.4vw, 44px);
+  line-height: 1.08;
+  letter-spacing: -1.6px;
+  margin-bottom: 16px;
+}
+
+.about-text p {
+  max-width: 800px;
+  color: rgba(255,255,255,.62);
+  font-size: 14px;
+  line-height: 1.85;
+}
+
+.about-text p + p {
+  margin-top: 12px;
+}
+
+/* ROADMAP */
+.roadmap-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.roadmap-pill {
+  border: 1px solid rgba(255,255,255,.09);
+  background: rgba(255,255,255,.04);
+  border-radius: 999px;
+  padding: 10px 13px;
+  color: rgba(255,255,255,.56);
+  font-size: 12px;
+}
+
+/* FOOTER */
+footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid rgba(255,255,255,.07);
+  padding: 34px 0;
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  color: rgba(255,255,255,.36);
+  font-size: 12px;
+}
+
+.footer-inner span {
+  color: var(--amber-lt);
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
   gap: 16px;
 }
 
-/* Card ativo */
-.sim-card {
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 16px;
-  overflow: hidden;
+.footer-links a {
   text-decoration: none;
-  display: flex; flex-direction: column;
-  transition: transform .2s, border-color .2s, box-shadow .2s;
-  position: relative;
-}
-.sim-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(212,88,10,.4);
-  box-shadow: 0 16px 48px rgba(13,27,42,.4), 0 0 0 1px rgba(212,88,10,.15);
-}
-.sim-card-header {
-  padding: 28px 28px 20px;
-  background: linear-gradient(135deg, rgba(30,58,95,.6), rgba(13,27,42,.8));
-  border-bottom: 1px solid rgba(255,255,255,.06);
-  position: relative; overflow: hidden;
-}
-.sim-card-header::after {
-  content: '';
-  position: absolute; top: -30px; right: -30px;
-  width: 120px; height: 120px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(212,88,10,.2), transparent 70%);
-}
-.sim-tag {
-  display: inline-block;
-  background: rgba(212,88,10,.15);
-  border: 1px solid rgba(212,88,10,.25);
-  color: var(--amber-lt);
-  font-size: 10px; font-weight: 600; letter-spacing: 1.5px;
-  text-transform: uppercase;
-  padding: 4px 10px; border-radius: 6px;
-  margin-bottom: 14px;
-}
-.sim-card-title {
-  font-size: 18px; font-weight: 700; letter-spacing: -.4px;
-  color: #fff; margin-bottom: 8px; line-height: 1.3;
-}
-.sim-card-sub {
-  font-size: 13px; color: rgba(255,255,255,.45);
-  line-height: 1.6;
-}
-.sim-card-body {
-  padding: 20px 28px 24px;
-  flex: 1; display: flex; flex-direction: column;
-}
-.sim-kpis {
-  display: flex; gap: 12px; margin-bottom: 20px;
-}
-.sim-kpi {
-  flex: 1; background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.07);
-  border-radius: 8px; padding: 10px 12px;
-}
-.sim-kpi-label { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.35); margin-bottom: 4px; }
-.sim-kpi-val { font-size: 13px; font-weight: 700; color: #fff; }
-.sim-cta {
-  margin-top: auto;
-  display: flex; align-items: center; justify-content: space-between;
-  padding-top: 16px; border-top: 1px solid rgba(255,255,255,.06);
-}
-.sim-cta-text { font-size: 13px; font-weight: 600; color: var(--amber); }
-.sim-cta-arrow {
-  width: 32px; height: 32px; border-radius: 8px;
-  background: rgba(212,88,10,.15);
-  display: flex; align-items: center; justify-content: center;
-  transition: background .15s;
-}
-.sim-card:hover .sim-cta-arrow { background: var(--amber); }
-.sim-cta-arrow svg { width: 14px; height: 14px; fill: var(--amber); transition: fill .15s; }
-.sim-card:hover .sim-cta-arrow svg { fill: #fff; }
-
-/* Card em breve */
-.sim-card-soon {
-  background: rgba(255,255,255,.02);
-  border: 1px dashed rgba(255,255,255,.1);
-  border-radius: 16px;
-  padding: 28px;
-  display: flex; flex-direction: column; justify-content: center;
-  min-height: 160px;
-  opacity: .6;
-}
-.soon-badge {
-  display: inline-block;
-  background: rgba(255,255,255,.06);
-  color: rgba(255,255,255,.4);
-  font-size: 10px; font-weight: 600; letter-spacing: 1.5px;
-  text-transform: uppercase; padding: 4px 10px; border-radius: 6px;
-  margin-bottom: 14px;
-}
-.soon-title {
-  font-size: 16px; font-weight: 700; color: rgba(255,255,255,.5);
-  margin-bottom: 6px;
-}
-.soon-sub { font-size: 12px; color: rgba(255,255,255,.25); line-height: 1.6; }
-
-/* ── SOBRE ── */
-.about-strip {
-  position: relative; z-index: 1;
-  background: rgba(255,255,255,.03);
-  border-top: 1px solid rgba(255,255,255,.06);
-  border-bottom: 1px solid rgba(255,255,255,.06);
-  padding: 64px 48px;
-}
-.about-inner {
-  max-width: 1100px; margin: 0 auto;
-  display: flex; align-items: center; gap: 48px;
-}
-.about-avatar {
-  width: 72px; height: 72px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--navy), var(--steel));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 24px; font-weight: 800; color: #fff;
-  flex-shrink: 0;
-  border: 2px solid rgba(212,88,10,.4);
-}
-.about-text h3 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; }
-.about-text p { font-size: 14px; color: rgba(255,255,255,.45); line-height: 1.7; max-width: 560px; }
-
-/* ── FOOTER ── */
-footer {
-  position: relative; z-index: 1;
-  text-align: center;
-  padding: 32px 48px;
-  font-size: 12px; color: rgba(255,255,255,.2);
-}
-footer span { color: var(--amber); }
-
-/* ── ANIMATIONS ── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
+  color: rgba(255,255,255,.46);
 }
 
-/* ── RESPONSIVE ── */
-@media (max-width: 600px) {
-  nav { padding: 16px 20px; }
-  .section { padding: 60px 20px; }
-  .hero { padding: 100px 20px 80px; }
-  .hero-title { letter-spacing: -1px; }
-  .about-strip { padding: 48px 20px; }
-  .about-inner { flex-direction: column; gap: 20px; }
-  footer { padding: 24px 20px; }
+.footer-links a:hover {
+  color: #fff;
+}
+
+/* RESPONSIVE */
+@media (max-width: 980px) {
+  nav {
+    padding: 15px 28px;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .container {
+    width: min(100% - 40px, 1120px);
+  }
+
+  .hero {
+    min-height: auto;
+    padding: 112px 0 52px;
+  }
+
+  .hero-title {
+    letter-spacing: -2.3px;
+  }
+
+  .tools-grid,
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .soon-card {
+    min-height: 230px;
+  }
+}
+
+@media (max-width: 620px) {
+  .container {
+    width: min(100% - 32px, 1120px);
+  }
+
+  nav {
+    padding: 14px 16px;
+  }
+
+  .nav-brand {
+    font-size: 14px;
+  }
+
+  .nav-cta {
+    display: none;
+  }
+
+  .hero {
+    padding-top: 98px;
+  }
+
+  .hero-title {
+    font-size: 42px;
+    letter-spacing: -1.5px;
+  }
+
+  .hero-sub {
+    font-size: 14px;
+  }
+
+  .hero-actions {
+    align-items: stretch;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .section {
+    padding: 54px 0;
+  }
+
+  .tool-card,
+  .soon-card {
+    min-height: auto;
+  }
+
+  .tool-header,
+  .tool-list,
+  .tool-footer {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 </style>
 </head>
+
 <body>
 
-<!-- NAV -->
 <nav>
-  <div class="nav-brand">Conta<span>com</span>Nico</div>
-  <div class="nav-tag">Lab Financeiro</div>
+  <a href="#" class="nav-brand">Conta<span>com</span>Nico</a>
+
+  <div class="nav-links">
+    <a href="#ferramentas">Ferramentas</a>
+    <a href="#sobre">Sobre</a>
+    <a href="#roadmap">Próximas</a>
+  </div>
+
+  <a href="#ferramentas" class="nav-cta">Acessar ferramenta</a>
 </nav>
 
-<!-- MAIN LAYOUT -->
-<section class="main-layout">
-  <div class="main-inner">
+<main>
 
-    <!-- COLUNA ESQUERDA: Hero -->
-    <div class="col-hero">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-inner">
+        <div class="hero-eyebrow">Ferramentas abertas · Finanças corporativas</div>
 
-  <div class="section-inner" style="width:100%">
-  <div class="hero-eyebrow">Ferramentas abertas · Conteúdo gratuito</div>
-  <h1 class="hero-title">Finanças corporativas<br>sem <em>caixa-preta</em></h1>
-  <p class="hero-sub">Simuladores interativos para apoiar decisões financeiras reais. Cada ferramenta nasceu de um problema concreto do dia a dia.</p>
-  <a href="simulador-cdb/" class="hero-cta">
-    Explorar ferramentas
-    <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  </a>
-  </div>
+        <h1 class="hero-title">
+          Finanças corporativas<br>
+          sem <em>caixa-preta</em>.
+        </h1>
 
-    </div>
+        <p class="hero-sub">
+          Simuladores e planilhas criados a partir de problemas reais de Tesouraria,
+          Gestão de Caixa e Investimentos Corporativos.
+        </p>
 
-    <!-- COLUNA DIREITA: Cards -->
-    <div class="col-cards">
-      <div class="section-label">Ferramentas disponíveis</div>
-      <div class="cards-grid">
-
-
-    <!-- Card 1: CDB -->
-    <a href="simulador-cdb/" class="sim-card">
-      <div class="sim-card-header">
-        <div class="sim-tag">Renda Fixa · IR Regressivo</div>
-        <div class="sim-card-title">CDB: Curto Prazo vs. Longo Prazo</div>
-        <div class="sim-card-sub">A taxa mais alta nem sempre é o maior retorno. O IR regressivo muda tudo.</div>
-      </div>
-      <div class="sim-card-body">
-        <div class="sim-cta">
-          <span class="sim-cta-text">Abrir simulador</span>
-          <div class="sim-cta-arrow">
-            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <div class="hero-actions">
+          <a href="#ferramentas" class="btn btn-primary">
+            Acessar ferramenta disponível
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-          </div>
+          </a>
+
+          <a href="#sobre" class="btn btn-secondary">
+            Conhecer o projeto
+          </a>
         </div>
       </div>
-    </a>
-
-    <!-- Card em breve -->
-    <div class="sim-card-soon">
-      <div class="soon-badge">Em breve</div>
-      <div class="soon-title">Compromissada x CDB: qual rende mais?</div>
-      <div class="soon-sub">Comparativo entre as duas aplicações mais comuns do caixa corporativo, considerando liquidez, IR e rentabilidade líquida.</div>
     </div>
+  </section>
 
-  
+  <!-- FERRAMENTAS -->
+  <section class="section tools" id="ferramentas">
+    <div class="container">
+      <div class="section-top">
+        <div class="section-label">Ferramentas disponíveis</div>
+        <h2 class="section-title">Comece pelo simulador de CDB.</h2>
+        <p class="section-sub">
+          A home apresenta o projeto. A análise acontece dentro da ferramenta, com simulação,
+          premissas e possibilidade de baixar a planilha.
+        </p>
+      </div>
+
+      <div class="tools-grid">
+        <a href="simulador-cdb/" class="tool-card">
+          <div class="tool-header">
+            <div class="tool-tag">Disponível agora</div>
+            <h3 class="tool-title">CDB: Curto Prazo vs. Longo Prazo</h3>
+            <p class="tool-sub">
+              Compare CDI, prazo, tributação e retorno líquido para entender quando a maior taxa
+              realmente entrega o melhor resultado.
+            </p>
+          </div>
+
+          <div class="tool-list">
+            <div>Comparação entre duas alternativas de CDB</div>
+            <div>Cálculo de retorno bruto e líquido</div>
+            <div>Efeito do prazo na alíquota de IR regressivo</div>
+            <div>Download da planilha para validação e uso próprio</div>
+          </div>
+
+          <div class="tool-footer">
+            <span class="tool-cta">Acessar ferramenta</span>
+            <span class="tool-arrow">
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+        </a>
+
+        <div class="soon-card">
+          <div>
+            <div class="soon-badge">Em breve</div>
+            <h3 class="soon-title">Compromissada x CDB</h3>
+            <p class="soon-sub">
+              Comparativo para avaliar liquidez, taxa, imposto e retorno líquido em aplicações comuns do caixa corporativo.
+            </p>
+          </div>
+
+          <a href="mailto:contacomnico@gmail.com?subject=Quero%20ser%20avisado%20sobre%20Compromissada%20x%20CDB" class="soon-link">
+            Quero ser avisado
+          </a>
+        </div>
       </div>
     </div>
+  </section>
 
-  </div>
-</section>
+  <!-- SOBRE -->
+  <section class="section about" id="sobre">
+    <div class="container about-grid">
+      <div class="profile-card">
+        <div class="profile-avatar">NL</div>
+        <div class="profile-name">Nico Lopes</div>
+        <div class="profile-role">
+          Finanças Corporativas · Tesouraria · Gestão de Caixa · Investimentos · Automação
+        </div>
+      </div>
 
-<!-- SOBRE -->
-<div class="about-strip">
-  <div class="about-inner">
-    <div class="about-avatar">NL</div>
-    <div class="about-text">
-      <h3>Nico Lopes · Finanças Corporativas</h3>
-      <p>Cada ferramenta aqui nasceu de uma pergunta real do trabalho. O objetivo é tornar raciocínios financeiros complexos acessíveis e verificáveis, sem depender de planilhas travadas ou caixas-pretas.</p>
+      <div class="about-text">
+        <div class="section-label">Sobre o projeto</div>
+        <h2>Ferramentas simples para análises financeiras do dia a dia.</h2>
+
+        <p>
+          O ContaComNico nasceu para transformar dúvidas práticas de finanças corporativas
+          em simuladores, planilhas e conteúdos abertos. A ideia é facilitar comparações,
+          deixar premissas mais claras e ajudar profissionais da área a tomarem decisões
+          com mais segurança.
+        </p>
+
+        <p>
+          O foco é Tesouraria, Gestão de Caixa, Investimentos Corporativos e temas que aparecem
+          na rotina de quem trabalha com números, liquidez e tomada de decisão.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROADMAP -->
+  <section class="section" id="roadmap">
+    <div class="container">
+      <div class="section-top">
+        <div class="section-label">Próximas ferramentas</div>
+        <h2 class="section-title">O projeto vai crescer por etapas.</h2>
+        <p class="section-sub">
+          A primeira ferramenta já está disponível. As próximas serão criadas a partir de temas
+          recorrentes da rotina financeira corporativa.
+        </p>
+      </div>
+
+      <div class="roadmap-grid">
+        <div class="roadmap-pill">Compromissada x CDB</div>
+        <div class="roadmap-pill">Fundo RF x CDB</div>
+        <div class="roadmap-pill">Escada de Liquidez</div>
+        <div class="roadmap-pill">Caixa Mínimo Operacional</div>
+        <div class="roadmap-pill">Concentração Bancária</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="container footer-inner">
+    <div>
+      Feito com propósito · <span>ContaComNico</span> · Lab Financeiro
+    </div>
+
+    <div class="footer-links">
+      <a href="#ferramentas">Ferramentas</a>
+      <a href="#sobre">Sobre</a>
+      <a href="mailto:contacomnico@gmail.com">Contato</a>
     </div>
   </div>
-</div>
-
-<!-- FOOTER -->
-<footer>
-  Feito com propósito · <span>ContaComNico</span> · Lab Financeiro
 </footer>
 
-</body>
 <script>
-document.querySelectorAll('a.sim-card').forEach(function(link) {
+document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+  anchor.addEventListener('click', function(e) {
+    var targetId = this.getAttribute('href');
+    if (!targetId || targetId === '#') return;
+
+    var target = document.querySelector(targetId);
+    if (!target) return;
+
+    e.preventDefault();
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+document.querySelectorAll('a.tool-card').forEach(function(link) {
   link.addEventListener('click', function(e) {
     e.preventDefault();
+
     var href = this.href;
     document.body.classList.add('page-leaving');
-    setTimeout(function(){ window.location.href = href; }, 250);
+
+    setTimeout(function() {
+      window.location.href = href;
+    }, 250);
   });
 });
 </script>
+
+</body>
 </html>
