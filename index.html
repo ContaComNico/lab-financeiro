@@ -162,7 +162,7 @@ nav {
 
 .section-top {
   max-width: 760px;
-  margin-bottom: 28px;
+  margin-bottom: 16px;
 }
 
 .section-label {
@@ -507,18 +507,23 @@ nav {
   line-height: 1.7;
 }
 
-.soon-link {
+.soon-status {
   display: inline-flex;
   align-items: center;
   align-self: flex-start;
+  gap: 8px;
   color: var(--amber-lt);
   font-size: 13px;
   font-weight: 850;
-  text-decoration: none;
 }
 
-.soon-link:hover {
-  text-decoration: underline;
+.soon-status::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 10px rgba(212,88,10,.75);
 }
 
 /* ABOUT */
@@ -568,6 +573,29 @@ nav {
   color: rgba(255,255,255,.5);
   font-size: 12px;
   line-height: 1.55;
+  margin-bottom: 18px;
+}
+
+.profile-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.1);
+  color: rgba(255,255,255,.78);
+  font-size: 12px;
+  font-weight: 800;
+  transition: background .15s ease, border-color .15s ease, transform .15s ease;
+}
+
+.profile-link:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,.07);
+  border-color: rgba(255,255,255,.18);
 }
 
 .about-text h2 {
@@ -742,7 +770,7 @@ footer {
 
   <div class="nav-links">
     <a href="#ferramentas">Ferramentas</a>
-    <a href="#sobre">Sobre</a>
+    <a href="#nico">Quem é o Nico?</a>
     <a href="#roadmap">Próximas</a>
   </div>
 
@@ -775,8 +803,8 @@ footer {
             </svg>
           </a>
 
-          <a href="#sobre" class="btn btn-secondary">
-            Conhecer o projeto
+          <a href="#nico" class="btn btn-secondary">
+            Quem é o Nico?
           </a>
         </div>
       </div>
@@ -787,12 +815,7 @@ footer {
   <section class="section tools" id="ferramentas">
     <div class="container">
       <div class="section-top">
-        <div class="section-label">Ferramentas disponíveis</div>
-        <h2 class="section-title">Comece pelo simulador de CDB.</h2>
-        <p class="section-sub">
-          A home apresenta o projeto. A análise acontece dentro da ferramenta, com simulação,
-          premissas e possibilidade de baixar a planilha.
-        </p>
+        <div class="section-label">Ferramentas</div>
       </div>
 
       <div class="tools-grid">
@@ -832,16 +855,16 @@ footer {
             </p>
           </div>
 
-          <a href="mailto:contacomnico@gmail.com?subject=Quero%20ser%20avisado%20sobre%20Compromissada%20x%20CDB" class="soon-link">
-            Quero ser avisado
-          </a>
+          <div class="soon-status">
+            Em desenvolvimento
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- SOBRE -->
-  <section class="section about" id="sobre">
+  <!-- QUEM É O NICO -->
+  <section class="section about" id="nico">
     <div class="container about-grid">
       <div class="profile-card">
         <div class="profile-avatar">NL</div>
@@ -849,22 +872,29 @@ footer {
         <div class="profile-role">
           Finanças Corporativas · Tesouraria · Gestão de Caixa · Investimentos · Automação
         </div>
+
+        <a href="https://www.linkedin.com/in/nicolasllopes/" target="_blank" rel="noopener noreferrer" class="profile-link">
+          Ver LinkedIn
+        </a>
       </div>
 
       <div class="about-text">
-        <div class="section-label">Sobre o projeto</div>
+        <div class="section-label">Quem é o Nico?</div>
         <h2>Ferramentas simples para análises financeiras do dia a dia.</h2>
 
         <p>
-          O ContaComNico nasceu para transformar dúvidas práticas de finanças corporativas
-          em simuladores, planilhas e conteúdos abertos. A ideia é facilitar comparações,
-          deixar premissas mais claras e ajudar profissionais da área a tomarem decisões
-          com mais segurança.
+          Sou profissional de Finanças Corporativas com atuação em Tesouraria, Gestão de Caixa,
+          Investimentos e Automação Financeira.
         </p>
 
         <p>
-          O foco é Tesouraria, Gestão de Caixa, Investimentos Corporativos e temas que aparecem
-          na rotina de quem trabalha com números, liquidez e tomada de decisão.
+          Criei o ContaComNico para compartilhar simuladores, planilhas e conteúdos práticos que
+          ajudem profissionais financeiros a compararem cenários, entenderem premissas e tomarem
+          decisões com mais clareza.
+        </p>
+
+        <p>
+          Tudo aqui nasce de situações reais vividas no dia a dia corporativo.
         </p>
       </div>
     </div>
@@ -902,8 +932,8 @@ footer {
 
     <div class="footer-links">
       <a href="#ferramentas">Ferramentas</a>
-      <a href="#sobre">Sobre</a>
-      <a href="mailto:contacomnico@gmail.com">Contato</a>
+      <a href="#nico">Quem é o Nico?</a>
+      <a href="https://www.linkedin.com/in/nicolasllopes/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
     </div>
   </div>
 </footer>
