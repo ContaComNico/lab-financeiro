@@ -180,10 +180,36 @@ nav {
 }
 
 /* ── CARDS GRID ── */
+
+/* ── MAIN LAYOUT ── */
+.main-layout {
+  position: relative; z-index: 1;
+  min-height: calc(100vh - 60px);
+  display: flex; align-items: center;
+  padding: 80px 0 40px;
+}
+.main-inner {
+  width: 100%;
+  padding: 0 48px;
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 48px;
+  align-items: center;
+}
+.col-hero {
+  display: flex; flex-direction: column;
+  align-items: flex-start;
+}
+.col-cards {
+  display: flex; flex-direction: column;
+  gap: 12px;
+}
+.col-cards .section-label { margin-bottom: 8px; }
+
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 20px;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
 /* Card ativo */
@@ -348,7 +374,24 @@ footer span { color: var(--amber); }
 <section class="main-layout">
   <div class="main-inner">
 
-    <!-- COLUNA ESQUERDA: Cards -->
+    <!-- COLUNA ESQUERDA: Hero -->
+    <div class="col-hero">
+
+  <div class="section-inner" style="width:100%">
+  <div class="hero-eyebrow">Ferramentas abertas · Conteúdo gratuito</div>
+  <h1 class="hero-title">Finanças corporativas<br>sem <em>caixa-preta</em></h1>
+  <p class="hero-sub">Simuladores interativos para apoiar decisões financeiras reais. Cada ferramenta nasceu de um problema concreto do dia a dia.</p>
+  <a href="simulador-cdb/" class="hero-cta">
+    Explorar ferramentas
+    <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </a>
+  </div>
+
+    </div>
+
+    <!-- COLUNA DIREITA: Cards -->
     <div class="col-cards">
       <div class="section-label">Ferramentas disponíveis</div>
       <div class="cards-grid">
@@ -382,23 +425,6 @@ footer span { color: var(--amber); }
 
   
       </div>
-    </div>
-
-    <!-- COLUNA DIREITA: Hero -->
-    <div class="col-hero">
-
-  <div class="section-inner" style="width:100%">
-  <div class="hero-eyebrow">Ferramentas abertas · Conteúdo gratuito</div>
-  <h1 class="hero-title">Finanças corporativas<br>sem <em>caixa-preta</em></h1>
-  <p class="hero-sub">Simuladores interativos para apoiar decisões financeiras reais. Cada ferramenta nasceu de um problema concreto do dia a dia.</p>
-  <a href="simulador-cdb/" class="hero-cta">
-    Explorar ferramentas
-    <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  </a>
-  </div>
-
     </div>
 
   </div>
