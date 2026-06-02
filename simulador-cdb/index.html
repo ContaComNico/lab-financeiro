@@ -602,7 +602,16 @@ function modelCalc() {
     });
   }
   // Atualiza análise de sensibilidade
-  modelCalcSensibilidade();
+  try {
+    modelCalcSensibilidade();
+  } catch(e) {
+    console.error('Erro em modelCalcSensibilidade:', e);
+    // Mostra erro nos cards para diagnóstico
+    ['m-ins-breakeven','m-ins-selic','m-ins-cdi'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.innerHTML = '<span style="color:#C0392B;font-size:10px">Erro: '+e.message+'</span>';
+    });
+  }
 }
 
 // ── MODELAGEM: EXPORTACAO ─────────────────────────────────────────────────
