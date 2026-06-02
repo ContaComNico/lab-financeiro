@@ -22,7 +22,7 @@
   }
   *{box-sizing:border-box}
   body{font-family:'Poppins',sans-serif;background:var(--bg-page);margin:0;color:var(--text)}
-  .page-scroll{flex:1;overflow-y:auto;padding:16px}
+  .page-scroll{padding:16px}
   .mod-bar{background:var(--bg);border-bottom:1px solid var(--border);padding:0 16px;height:38px;display:flex;align-items:center;gap:6px;flex-shrink:0}
   .mod-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px}
   .mod-sep{width:1px;height:16px;background:var(--border)}
@@ -42,8 +42,8 @@
   .btn-tema{background:none;border:1px solid var(--border);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px;color:var(--text2);font-family:'Poppins',sans-serif;transition:all .2s}
   .btn-tema:hover{background:var(--bg2);border-color:#D4580A}
 
-    html,body{height:100%;display:flex;flex-direction:column}
-    #pg-inv-model{display:flex;flex-direction:column;flex:1;height:100vh;overflow:hidden}
+    html,body{height:100%;}
+    #pg-inv-model{display:block;}
   </style>
 </head>
 <body>
@@ -602,16 +602,7 @@ function modelCalc() {
     });
   }
   // Atualiza análise de sensibilidade
-  try {
-    modelCalcSensibilidade();
-  } catch(e) {
-    console.error('Erro em modelCalcSensibilidade:', e);
-    // Mostra erro nos cards para diagnóstico
-    ['m-ins-breakeven','m-ins-selic','m-ins-cdi'].forEach(function(id){
-      var el = document.getElementById(id);
-      if(el) el.innerHTML = '<span style="color:#C0392B;font-size:10px">Erro: '+e.message+'</span>';
-    });
-  }
+  setTimeout(function(){ modelCalcSensibilidade(); }, 100);
 }
 
 // ── MODELAGEM: EXPORTACAO ─────────────────────────────────────────────────
