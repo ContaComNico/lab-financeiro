@@ -22,7 +22,7 @@
   }
   *{box-sizing:border-box}
   body{font-family:'Poppins',sans-serif;background:var(--bg-page);margin:0;color:var(--text)}
-  .page-scroll{padding:16px}
+  .page-scroll{flex:1;overflow-y:auto;padding:16px}
   .mod-bar{background:var(--bg);border-bottom:1px solid var(--border);padding:0 16px;height:38px;display:flex;align-items:center;gap:6px;flex-shrink:0}
   .mod-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px}
   .mod-sep{width:1px;height:16px;background:var(--border)}
@@ -42,26 +42,11 @@
   .btn-tema{background:none;border:1px solid var(--border);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px;color:var(--text2);font-family:'Poppins',sans-serif;transition:all .2s}
   .btn-tema:hover{background:var(--bg2);border-color:#D4580A}
 
-    html,body{height:100%;}
-    #pg-inv-model{display:block;}
+    html,body{height:100%;display:flex;flex-direction:column}
+    #pg-inv-model{display:flex;flex-direction:column;flex:1;height:100vh;overflow:hidden}
   </style>
 </head>
 <body>
-
-<!-- BACK BUTTON -->
-<div style="background:#0D1B2A;padding:10px 20px;border-bottom:1px solid rgba(255,255,255,.08)">
-  <a href="../" style="
-    display:inline-flex;align-items:center;gap:8px;
-    font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;
-    color:rgba(255,255,255,.55);text-decoration:none;
-    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
-    padding:7px 16px;border-radius:100px;
-    transition:all .2s;letter-spacing:.3px;
-  " onmouseover="this.style.color='#fff';this.style.background='rgba(212,88,10,.2)';this.style.borderColor='rgba(212,88,10,.4)'"
-     onmouseout="this.style.color='rgba(255,255,255,.55)';this.style.background='rgba(255,255,255,.07)';this.style.borderColor='rgba(255,255,255,.12)'">
-    ← Lab Financeiro
-  </a>
-</div>
 
 
 <!-- MODELAGEM CP x LP -->
