@@ -342,14 +342,7 @@ label{display:block;margin-bottom:5px;font-size:11px;font-weight:700;color:#888;
         <div class="full-card" style="margin-bottom:16px">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
             <div class="sec-title" style="margin:0">Evolução do Montante Líquido</div>
-            <div style="display:flex;gap:14px;font-size:11px;color:var(--text3)">
-              <span style="display:flex;align-items:center;gap:5px">
-                <span style="width:18px;height:2.5px;background:#1E3A5F;display:inline-block;border-radius:2px"></span>A+Reinvestimento
-              </span>
-              <span style="display:flex;align-items:center;gap:5px">
-                <span style="width:18px;height:0;border-top:2.5px dashed #E65100;display:inline-block"></span>Opcao B
-              </span>
-            </div>
+            
           </div>
           <div style="position:relative;height:280px"><canvas id="chartModelBreakeven"></canvas></div>
           <div style="font-size:11px;color:var(--text3);margin-top:8px;font-style:italic" id="m-breakeven-legenda">
@@ -583,7 +576,7 @@ function modelCalc() {
       },
       options:{
         responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:{display:false}, datalabels:{display:true} },
+        plugins:{ legend:{display:true, position:'top', align:'end'}, datalabels:{display:true} },
         scales:{
           x:{ grid:{display:false}, ticks:{font:{size:11},color:'#9BA5A0'} },
           y:{ grid:{color:'#F0F4F2'}, ticks:{font:{size:9},color:'#9BA5A0',callback:function(v){return 'R$'+fmtK(v);}} }
@@ -624,7 +617,7 @@ function modelCalc() {
       options:{
         responsive:true, maintainAspectRatio:false,
         interaction:{ mode:'index', intersect:false },
-        plugins:{ legend:{display:false}, datalabels:{display:true} },
+        plugins:{ legend:{display:true, position:'top', align:'end'}, datalabels:{display:true} },
         scales:{
           x:{ grid:{display:false}, ticks:{font:{size:11},color:'#9BA5A0'} },
           y:{ grid:{color:'#F0F4F2'}, ticks:{font:{size:9},color:'#9BA5A0',callback:function(v){return 'R$'+fmtK(v);}} }
@@ -1236,7 +1229,7 @@ function modelCalc() {
       },
       options:{
         responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:{display:false}, datalabels:{display:true} },
+        plugins:{ legend:{display:true, position:'top', align:'end'}, datalabels:{display:true} },
         scales:{
           x:{ grid:{display:false}, ticks:{font:{size:11},color:'#9BA5A0'} },
           y:{ grid:{color:'#F0F4F2'}, ticks:{font:{size:9},color:'#9BA5A0',callback:function(v){return 'R$'+fmtK(v);}} }
@@ -1277,7 +1270,7 @@ function modelCalc() {
       options:{
         responsive:true, maintainAspectRatio:false,
         interaction:{ mode:'index', intersect:false },
-        plugins:{ legend:{display:false}, datalabels:{display:true} },
+        plugins:{ legend:{display:true, position:'top', align:'end'}, datalabels:{display:true} },
         scales:{
           x:{ grid:{display:false}, ticks:{font:{size:11},color:'#9BA5A0'} },
           y:{ grid:{color:'#F0F4F2'}, ticks:{font:{size:9},color:'#9BA5A0',callback:function(v){return 'R$'+fmtK(v);}} }
