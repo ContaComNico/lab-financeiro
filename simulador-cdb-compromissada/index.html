@@ -1,1 +1,985 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CDB vs Compromissada | Lab Financeiro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    :root {
+      --midnight: #0D1B2A;
+      --navy: #1E3A5F;
+      --steel: #2D6A9F;
+      --amber: #D4580A;
+      --amber-light: #F0A06A;
+      --cloud: #F5F7FA;
+      --white: #ffffff;
+      --text-muted: #8ea3ba;
+      --border: rgba(45,106,159,0.25);
+      --card-bg: rgba(30,58,95,0.45);
+      --input-bg: rgba(13,27,42,0.7);
+    }
 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--midnight);
+      color: var(--cloud);
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    .top-nav {
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .top-nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color .2s;
+    }
+    .top-nav a:hover { color: var(--amber-light); }
+    .top-nav .sep { color: var(--border); font-size: 18px; }
+
+    /* ── HEADER ── */
+    .hero {
+      text-align: center;
+      padding: 48px 24px 32px;
+      position: relative;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 200px;
+      background: radial-gradient(ellipse, rgba(212,88,10,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(212,88,10,0.15);
+      border: 1px solid rgba(212,88,10,0.4);
+      color: var(--amber-light);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-size: clamp(24px, 4vw, 38px);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.2;
+    }
+    .hero h1 span { color: var(--amber); }
+    .hero p {
+      margin-top: 12px;
+      color: var(--text-muted);
+      font-size: 14px;
+      max-width: 560px;
+      margin-inline: auto;
+      line-height: 1.7;
+    }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px 64px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      backdrop-filter: blur(8px);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .card-icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .card-icon.cdb { background: rgba(45,106,159,0.25); }
+    .card-icon.comp { background: rgba(212,88,10,0.2); }
+    .card-icon.shared { background: rgba(45,106,159,0.15); }
+    .card h2 { font-size: 15px; font-weight: 600; color: var(--white); }
+    .card .subtitle { font-size: 11px; color: var(--text-muted); font-weight: 400; margin-top: 2px; }
+
+    /* ── FORM FIELDS ── */
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    input[type="number"], input[type="text"], select {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--cloud);
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    input[type="number"]:focus, select:focus {
+      border-color: var(--steel);
+    }
+    input[type="number"]::placeholder { color: var(--text-muted); }
+    select option { background: var(--midnight); }
+
+    .input-suffix {
+      position: relative;
+    }
+    .input-suffix input { padding-right: 40px; }
+    .input-suffix .suffix {
+      position: absolute;
+      right: 12px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      pointer-events: none;
+    }
+
+    /* ── CALC BUTTON ── */
+    .btn-calc {
+      width: 100%;
+      background: linear-gradient(135deg, var(--amber), #b84500);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      padding: 13px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity .2s, transform .1s;
+    }
+    .btn-calc:hover { opacity: .9; transform: translateY(-1px); }
+    .btn-calc:active { transform: translateY(0); }
+
+    /* ── RESULT BANNER ── */
+    #result-banner {
+      display: none;
+      margin: 24px 0;
+      border-radius: 14px;
+      padding: 20px 28px;
+      border: 1px solid;
+    }
+    #result-banner.cdb-wins {
+      background: rgba(45,106,159,0.15);
+      border-color: rgba(45,106,159,0.4);
+    }
+    #result-banner.comp-wins {
+      background: rgba(212,88,10,0.12);
+      border-color: rgba(212,88,10,0.35);
+    }
+    .banner-inner { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .banner-icon { font-size: 28px; }
+    .banner-title { font-size: 16px; font-weight: 700; color: var(--white); }
+    .banner-sub { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+    .banner-tag {
+      margin-left: auto;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .cdb-wins .banner-tag { background: rgba(45,106,159,0.3); color: #7dc4f5; }
+    .comp-wins .banner-tag { background: rgba(212,88,10,0.25); color: var(--amber-light); }
+
+    /* ── METRICS ROW ── */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 900px) { .metrics-row { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .metrics-row { grid-template-columns: 1fr 1fr; } }
+
+    .metric {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+    }
+    .metric-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .metric-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--white);
+    }
+    .metric-value.cdb-color { color: #7dc4f5; }
+    .metric-value.comp-color { color: var(--amber-light); }
+    .metric-value.winner-color { color: #6ee7b7; }
+    .metric-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+    thead tr.th-groups th {
+      padding: 9px 14px 7px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      border-bottom: 1px solid rgba(0,0,0,0.15);
+    }
+    thead tr.th-groups .th-day    { background: rgba(20,35,55,0.8); color: var(--text-muted); width: 52px; }
+    thead tr.th-groups .th-cdb    { background: rgba(45,106,159,0.35); color: #7dc4f5; border-left: 2px solid rgba(125,196,245,0.3); }
+    thead tr.th-groups .th-comp   { background: rgba(212,88,10,0.2); color: var(--amber-light); border-left: 2px solid rgba(240,160,106,0.3); }
+    thead tr.th-groups .th-result { background: rgba(20,35,55,0.8); color: #6ee7b7; border-left: 2px solid rgba(110,231,183,0.25); }
+
+    thead tr.th-cols th {
+      padding: 7px 14px 9px;
+      text-align: right;
+      font-weight: 600;
+      font-size: 10px;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
+      background: rgba(30,58,95,0.5);
+    }
+    thead tr.th-cols .th-day-sub { text-align: center; }
+    thead tr.th-cols .th-cdb-sub { border-left: 2px solid rgba(125,196,245,0.15); }
+    thead tr.th-cols .th-comp-sub { border-left: 2px solid rgba(240,160,106,0.15); }
+    thead tr.th-cols .th-result-sub { border-left: 2px solid rgba(110,231,183,0.1); }
+
+    tbody tr { border-bottom: 1px solid rgba(45,106,159,0.1); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(45,106,159,0.08); }
+    tbody td {
+      padding: 8px 14px;
+      text-align: right;
+      color: var(--cloud);
+      white-space: nowrap;
+    }
+    tbody td.td-day { text-align: center; color: var(--text-muted); font-weight: 600; font-size: 12px; }
+    tbody td.td-cdb-group { border-left: 3px solid rgba(125,196,245,0.35); }
+    tbody td.td-comp-group { border-left: 3px solid rgba(240,160,106,0.4); }
+    tbody td.td-result-group { border-left: 3px solid rgba(110,231,183,0.3); }
+    .td-winner {
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+    .td-cdb { color: #7dc4f5; }
+    .td-comp { color: var(--amber-light); }
+    .td-winner-cdb { background: rgba(45,106,159,0.2); color: #7dc4f5; }
+    .td-winner-comp { background: rgba(212,88,10,0.2); color: var(--amber-light); }
+    .iof-row td { color: #f87171 !important; }
+    .cdb-winning-row { background: rgba(125,196,245,0.04); }
+    .cdb-winning-row td.td-day { color: #7dc4f5 !important; }
+    .breakeven-row { background: rgba(125,196,245,0.1) !important; }
+    .breakeven-row td.td-day { color: #7dc4f5 !important; font-weight: 700; }
+
+    /* ── CHARTS ── */
+    .chart-wrap {
+      position: relative;
+      height: 280px;
+    }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── IOF LEGEND ── */
+    .iof-legend {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: rgba(248,113,113,0.07);
+      border: 1px solid rgba(248,113,113,0.2);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 12px;
+      color: #fca5a5;
+      line-height: 1.6;
+    }
+    .iof-legend .icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── BREAKEVEN HIGHLIGHT ── */
+    .breakeven-box {
+      background: rgba(110,231,183,0.07);
+      border: 1px solid rgba(110,231,183,0.25);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #6ee7b7;
+    }
+    .breakeven-box strong { font-weight: 700; }
+
+    /* ── HIDDEN ── */
+    .results-section { display: none; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 24px;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+    footer a { color: var(--steel); text-decoration: none; }
+    footer a:hover { color: var(--amber-light); }
+
+    /* ── TOOLTIP ── */
+    .tooltip {
+      display: inline-block;
+      width: 15px; height: 15px;
+      background: rgba(45,106,159,0.3);
+      border-radius: 50%;
+      font-size: 10px;
+      text-align: center;
+      line-height: 15px;
+      cursor: help;
+      color: var(--text-muted);
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+    /* ── PARAMS CARD ── */
+    .params-card { max-width: 780px; margin-inline: auto; }
+
+    .params-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      align-items: end;
+    }
+    @media (max-width: 640px) {
+      .params-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 420px) {
+      .params-grid { grid-template-columns: 1fr; }
+    }
+
+    .params-divider {
+      grid-column: 1 / -1;
+      height: 1px;
+      background: var(--border);
+      margin: 4px 0;
+    }
+
+    .label-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+    .dot-cdb { background: #7dc4f5; }
+    .dot-comp { background: var(--amber-light); }
+
+    .field-note {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 5px;
+      font-weight: 400;
+    }
+    .field-highlight-cdb .field-note { color: #7dc4f5; opacity: .7; }
+    .field-highlight-comp .field-note { color: var(--amber-light); opacity: .7; }
+
+    .btn-field { grid-column: span 1; }
+    @media (max-width: 640px) { .btn-field { grid-column: 1 / -1; } }
+
+    /* ── EXPORT BUTTON ── */
+    .btn-export {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(110,231,183,0.1);
+      border: 1px solid rgba(110,231,183,0.3);
+      color: #6ee7b7;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+      white-space: nowrap;
+    }
+    .btn-export:hover { background: rgba(110,231,183,0.18); transform: translateY(-1px); }
+    .btn-export:active { transform: translateY(0); }
+    .btn-export-sm {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(110,231,183,0.08);
+      border: 1px solid rgba(110,231,183,0.2);
+      color: #6ee7b7;
+      font-family: 'Poppins', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .4px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background .2s;
+      margin-left: auto;
+      text-transform: uppercase;
+    }
+    .btn-export-sm:hover { background: rgba(110,231,183,0.15); }
+
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="top-nav">
+  <a href="../index.html">
+    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+    </svg>
+    Lab Financeiro
+  </a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Lab Financeiro · Renda Fixa</div>
+  <h1>CDB <span>×</span> Compromissada</h1>
+  <p>Compare o rendimento líquido de um CDB com o de uma Operação Compromissada, levando em conta IOF, IR regressivo e o diferencial de alíquota.</p>
+</div>
+
+<!-- MAIN -->
+<div class="container">
+
+  <!-- INPUTS card unificado -->
+  <div class="card params-card" style="margin-bottom:20px;">
+    <div class="card-header">
+      <div class="card-icon shared">⚙️</div>
+      <div>
+        <h2>Parâmetros</h2>
+        <div class="subtitle">IR regressivo aplicado automaticamente · IOF calculado por tabela</div>
+      </div>
+    </div>
+
+    <div class="params-grid">
+      <!-- Valor -->
+      <div class="field">
+        <label>Valor Investido</label>
+        <div class="input-suffix">
+          <input type="text" id="investment" value="100.000" inputmode="numeric" placeholder="Ex: 100.000" autocomplete="off" />
+          <span class="suffix">R$</span>
+        </div>
+      </div>
+
+      <!-- CDI -->
+      <div class="field">
+        <label>CDI Anual</label>
+        <div class="input-suffix">
+          <input type="number" id="cdi" value="13.25" step="0.01" min="0.01" placeholder="13,25" />
+          <span class="suffix">% a.a.</span>
+        </div>
+      </div>
+
+      <!-- Divider visual -->
+      <div class="params-divider"></div>
+
+      <!-- CDB % CDI -->
+      <div class="field field-highlight-cdb">
+        <label>
+          <span class="label-dot dot-cdb"></span>
+          CDB: % do CDI
+        </label>
+        <div class="input-suffix">
+          <input type="number" id="cdb-pct" value="104" step="0.5" min="1" max="200" />
+          <span class="suffix">%</span>
+        </div>
+        <div class="field-note">Sujeito a IOF nos primeiros 30 dias</div>
+      </div>
+
+      <!-- Compromissada % CDI -->
+      <div class="field field-highlight-comp">
+        <label>
+          <span class="label-dot dot-comp"></span>
+          Compromissada: % do CDI
+        </label>
+        <div class="input-suffix">
+          <input type="number" id="comp-pct" value="95" step="0.5" min="1" max="200" />
+          <span class="suffix">%</span>
+        </div>
+        <div class="field-note">Isenta de IOF em qualquer prazo</div>
+      </div>
+
+      <!-- Botão -->
+      <div class="field btn-field" style="display:flex; gap:10px;">
+        <button class="btn-calc" style="flex:1;" onclick="calcular()">⚡ Calcular</button>
+        <button class="btn-export" onclick="exportarExcel()" id="btn-export-top" style="display:none;">⬇ Excel</button>
+      </div>
+    </div>
+
+    <!-- hidden inputs mantidos para compatibilidade com JS -->
+    <input type="hidden" id="days" value="35" />
+    <input type="hidden" id="ir1" value="22.5" />
+    <input type="hidden" id="ir2" value="20" />
+    <input type="hidden" id="ir3" value="17.5" />
+    <input type="hidden" id="ir4" value="15" />
+  </div>
+
+  <!-- RESULTADOS -->
+  <div class="results-section" id="results-section">
+
+    <!-- MÉTRICAS -->
+    <div class="metrics-row">
+      <div class="metric">
+        <div class="metric-label">Rendimento Bruto CDB</div>
+        <div class="metric-value cdb-color" id="m-bruto-cdb">...</div>
+        <div class="metric-sub" id="m-bruto-cdb-pct">...</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Rendimento Bruto Compromissada</div>
+        <div class="metric-value comp-color" id="m-bruto-comp">...</div>
+        <div class="metric-sub" id="m-bruto-comp-pct">...</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Rendimento Líquido CDB</div>
+        <div class="metric-value cdb-color" id="m-liq-cdb">...</div>
+        <div class="metric-sub" id="m-liq-cdb-pct">...</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Rendimento Líquido Compromissada</div>
+        <div class="metric-value comp-color" id="m-liq-comp">...</div>
+        <div class="metric-sub" id="m-liq-comp-pct">...</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">IOF sobre o CDB</div>
+        <div class="metric-value" style="color:#f87171;" id="m-iof">...</div>
+        <div class="metric-sub" id="m-iof-sub">...</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">IR sobre o CDB</div>
+        <div class="metric-value" style="color:#fb923c;" id="m-ir-cdb">...</div>
+        <div class="metric-sub" id="m-ir-cdb-sub">...</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">IR sobre a Compromissada</div>
+        <div class="metric-value" style="color:#fb923c;" id="m-ir-comp">...</div>
+        <div class="metric-sub" id="m-ir-comp-sub">...</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Diferença Líquida</div>
+        <div class="metric-value winner-color" id="m-diff">...</div>
+        <div class="metric-sub" id="m-diff-sub">...</div>
+      </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div style="margin-bottom:24px;">
+      <div class="card">
+        <div class="section-title">Rendimento Líquido ao Longo do Tempo</div>
+        <div class="chart-wrap"><canvas id="chart-evolution"></canvas></div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card">
+      <div class="section-title">
+        Detalhamento Diário
+        <button class="btn-export-sm" onclick="exportarExcel()">⬇ Excel</button>
+      </div>
+      <div class="table-wrap">
+        <table id="detail-table">
+          <thead>
+            <tr class="th-groups">
+              <th class="th-day" rowspan="2"></th>
+              <th class="th-cdb" colspan="3">📄 CDB</th>
+              <th class="th-comp" colspan="3">🔄 Compromissada</th>
+              <th class="th-result" rowspan="2">Vencedor</th>
+            </tr>
+            <tr class="th-cols">
+              <th class="th-cdb-sub">Rend. Bruto</th>
+              <th class="th-cdb-sub">IOF</th>
+              <th class="th-cdb-sub">Rend. Líquido</th>
+              <th class="th-comp-sub">Rend. Bruto</th>
+              <th class="th-comp-sub">IR</th>
+              <th class="th-comp-sub">Rend. Líquido</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /results-section -->
+</div><!-- /container -->
+
+<footer>
+  <p>Lab Financeiro · <a href="https://contacomnico.github.io/lab-financeiro/" target="_blank">contacomnico.github.io/lab-financeiro</a> · Fins educacionais</p>
+</footer>
+
+<script>
+// ── IOF TABLE (dias 1–29 → %, dia 30+ → 0)
+const IOF_TABLE = [96,93,90,86,83,80,76,73,70,66,63,60,56,53,50,46,43,40,36,33,30,26,23,20,16,13,10,6,3];
+
+function getIOFPct(day) {
+  if (day >= 30) return 0;
+  return IOF_TABLE[day - 1] / 100;
+}
+
+function getIRPct(days, ir1, ir2, ir3, ir4) {
+  if (days <= 180) return ir1 / 100;
+  if (days <= 360) return ir2 / 100;
+  if (days <= 720) return ir3 / 100;
+  return ir4 / 100;
+}
+
+function dailyRate(annualPct) {
+  return Math.pow(1 + annualPct / 100, 1 / 252) - 1;
+}
+
+function fmt(v, dec = 2) {
+  return v.toLocaleString('pt-BR', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+}
+function fmtR(v) { return 'R$ ' + fmt(v); }
+function fmtP(v, dec = 4) { return fmt(v, dec) + '%'; }
+
+function updateDisplays() {
+  // mantido vazio - campos de taxa/IR removidos da UI
+}
+
+// ── CHARTS refs
+let chartEvolution = null;
+
+// Parse BR-formatted number (1.000.000,50 → 1000000.50)
+function parseInvestment(val) {
+  // Remove pontos de milhar, troca vírgula decimal por ponto
+  const clean = val.replace(/\./g, '').replace(',', '.');
+  return parseFloat(clean) || 0;
+}
+
+// Formata número como inteiro com pontos de milhar BR (sem decimais)
+function maskInvestment(val) {
+  const num = parseInvestment(val);
+  if (!num) return val;
+  return Math.round(num).toLocaleString('pt-BR');
+}
+
+// Mask on blur: formata o campo
+document.addEventListener('DOMContentLoaded', () => {
+  const inv = document.getElementById('investment');
+  inv.addEventListener('blur', () => {
+    inv.value = maskInvestment(inv.value);
+  });
+  inv.addEventListener('keypress', (e) => {
+    // Permite: dígitos, ponto, vírgula, backspace
+    if (!/[\d.,]/.test(e.key) && e.key !== 'Backspace') e.preventDefault();
+  });
+});
+
+function calcular() {
+  const inv = parseInvestment(document.getElementById('investment').value);
+  const cdi = parseFloat(document.getElementById('cdi').value) || 0;
+  const cdbPct = parseFloat(document.getElementById('cdb-pct').value) || 0;
+  const compPct = parseFloat(document.getElementById('comp-pct').value) || 0;
+  const totalDays = 35; // fixo - mostra a virada do IOF no D30
+  const ir1 = 22.5, ir2 = 20, ir3 = 17.5, ir4 = 15;
+
+  if (!inv || !cdi) return;
+
+  const cdbAnn = cdi * (cdbPct / 100);
+  const compAnn = cdi * (compPct / 100);
+  const cdbDr = dailyRate(cdbAnn);
+  const compDr = dailyRate(compAnn);
+
+  // Build daily series
+  const rows = [];
+  let cdbAmount = inv, compAmount = inv;
+
+  for (let d = 1; d <= totalDays; d++) {
+    cdbAmount = cdbAmount * (1 + cdbDr);
+    compAmount = compAmount * (1 + compDr);
+
+    const cdbBruto = cdbAmount - inv;
+    const compBruto = compAmount - inv;
+
+    const iofPct = getIOFPct(d);
+    const irPct = getIRPct(d, ir1, ir2, ir3, ir4);
+
+    const iof = cdbBruto * iofPct;
+    const cdbBrutoLiqIOF = cdbBruto - iof;
+    const irCDB = cdbBrutoLiqIOF * irPct;
+    const cdbLiq = cdbBrutoLiqIOF - irCDB;
+
+    const irComp = compBruto * irPct;
+    const compLiq = compBruto - irComp;
+
+    const diff = cdbLiq - compLiq;
+
+    rows.push({ d, cdbAmount, cdbBruto, iof, iofPct, irCDB, irPct, cdbLiq, compAmount, compBruto, irComp, compLiq, diff });
+  }
+
+  const last = rows[rows.length - 1];
+  // dia 30 (índice 29) - primeiro dia sem IOF
+  const d30 = rows[29];
+
+  // Métricas - mostra valores no D30 (virada) e D35 (final)
+  document.getElementById('m-bruto-cdb').textContent = fmtR(last.cdbBruto);
+  document.getElementById('m-bruto-cdb-pct').textContent = fmtP(last.cdbBruto / inv * 100) + ' do capital';
+  document.getElementById('m-bruto-comp').textContent = fmtR(last.compBruto);
+  document.getElementById('m-bruto-comp-pct').textContent = fmtP(last.compBruto / inv * 100) + ' do capital';
+  document.getElementById('m-liq-cdb').textContent = fmtR(last.cdbLiq);
+  document.getElementById('m-liq-cdb-pct').textContent = fmtP(last.cdbLiq / inv * 100) + ' do capital';
+  document.getElementById('m-liq-comp').textContent = fmtR(last.compLiq);
+  document.getElementById('m-liq-comp-pct').textContent = fmtP(last.compLiq / inv * 100) + ' do capital';
+  document.getElementById('m-iof').textContent = fmtR(d30.iof);
+  document.getElementById('m-iof-sub').textContent = 'IOF no D29, zero a partir do D30';
+  document.getElementById('m-ir-cdb').textContent = fmtR(last.irCDB);
+  document.getElementById('m-ir-cdb-sub').textContent = 'Alíq. ' + fmtP(last.irPct * 100, 1) + ' (D35)';
+  document.getElementById('m-ir-comp').textContent = fmtR(last.irComp);
+  document.getElementById('m-ir-comp-sub').textContent = 'Alíq. ' + fmtP(last.irPct * 100, 1) + ' (D35)';
+
+  const diffAbs = Math.abs(last.diff);
+  document.getElementById('m-diff').textContent = (last.diff >= 0 ? '+' : '-') + fmtR(diffAbs);
+  document.getElementById('m-diff-sub').textContent = last.diff >= 0 ? 'CDB superior no D35' : 'Compromissada superior no D35';
+
+  // Gráfico de evolução - todos os 35 dias, linha vertical no D30
+  const labels = rows.map(r => 'D' + r.d);
+  const cdbLiqSeries = rows.map(r => r.cdbLiq);
+  const compLiqSeries = rows.map(r => r.compLiq);
+
+  // Plugin inline para linha vertical no D30
+  const d30LinePlugin = {
+    id: 'd30line',
+    afterDraw(chart) {
+      const { ctx, chartArea, scales } = chart;
+      const xPos = scales.x.getPixelForValue(29); // índice 29 = D30
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(xPos, chartArea.top);
+      ctx.lineTo(xPos, chartArea.bottom);
+      ctx.strokeStyle = 'rgba(248,113,113,0.5)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 3]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      // Label
+      ctx.fillStyle = '#f87171';
+      ctx.font = '600 10px Poppins, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('D30 · IOF = 0', xPos, chartArea.top - 6);
+      ctx.restore();
+    }
+  };
+
+  if (chartEvolution) chartEvolution.destroy();
+  chartEvolution = new Chart(document.getElementById('chart-evolution'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'CDB Líquido',
+          data: cdbLiqSeries,
+          borderColor: '#7dc4f5',
+          backgroundColor: 'rgba(125,196,245,0.08)',
+          tension: 0.3, pointRadius: 3, pointHoverRadius: 5,
+          borderWidth: 2
+        },
+        {
+          label: 'Compromissada Líquida',
+          data: compLiqSeries,
+          borderColor: '#F0A06A',
+          backgroundColor: 'rgba(240,160,106,0.08)',
+          tension: 0.3, pointRadius: 3, pointHoverRadius: 5,
+          borderWidth: 2
+        }
+      ]
+    },
+    plugins: [d30LinePlugin],
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 18 } },
+      plugins: {
+        legend: { labels: { color: '#8ea3ba', font: { family: 'Poppins', size: 11 }, boxWidth: 12 } },
+        tooltip: { callbacks: { label: ctx => ' R$ ' + fmt(ctx.raw) } }
+      },
+      scales: {
+        x: { ticks: { color: '#8ea3ba', font: { size: 10 } }, grid: { color: 'rgba(45,106,159,0.15)' } },
+        y: { ticks: { color: '#8ea3ba', font: { size: 10 }, callback: v => 'R$ ' + fmt(v) }, grid: { color: 'rgba(45,106,159,0.15)' } }
+      }
+    }
+  });
+
+  // Tabela - todos os 35 dias
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '';
+  rows.forEach(r => {
+    const winner = r.diff > 0
+      ? '<span class="td-winner td-winner-cdb">CDB</span>'
+      : r.diff < 0
+        ? '<span class="td-winner td-winner-comp">Comp.</span>'
+        : '<span style="color:#8ea3ba;font-size:11px">Empate</span>';
+    const isCDBWinning = r.diff > 0;
+    const isBreakeven = isCDBWinning && (rows[r.d - 2]?.diff ?? -1) <= 0;
+    const rowClass = isBreakeven ? ' class="breakeven-row"'
+      : isCDBWinning ? ' class="cdb-winning-row"'
+      : r.iof > 0 ? ' class="iof-row"'
+      : '';
+    const dayCell = isBreakeven
+      ? `<td class="td-day"><strong style="color:#7dc4f5">${r.d} ★</strong></td>`
+      : `<td class="td-day">${r.d}</td>`;
+    tbody.innerHTML += `
+      <tr${rowClass}>
+        ${dayCell}
+        <td class="td-cdb td-cdb-group">${fmtR(r.cdbBruto)}</td>
+        <td class="td-cdb-group" style="color:${r.iof > 0 ? '#f87171' : '#6ee7b7'}">${r.iof > 0 ? fmtR(r.iof) : 'R$ 0,00'}</td>
+        <td class="td-cdb td-cdb-group"><strong>${fmtR(r.cdbLiq)}</strong></td>
+        <td class="td-comp td-comp-group">${fmtR(r.compBruto)}</td>
+        <td class="td-comp-group" style="color:#fb923c;">${fmtR(r.irComp)}</td>
+        <td class="td-comp td-comp-group"><strong>${fmtR(r.compLiq)}</strong></td>
+        <td class="td-result-group" style="text-align:center;">${winner}</td>
+      </tr>`;
+  });
+
+  document.getElementById('results-section').style.display = 'block';
+  document.getElementById('btn-export-top').style.display = 'inline-flex';
+  document.getElementById('results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function exportarExcel() {
+  const inv = parseInvestment(document.getElementById('investment').value);
+  const cdi = parseFloat(document.getElementById('cdi').value) || 0;
+  const cdbPct = parseFloat(document.getElementById('cdb-pct').value) || 0;
+  const compPct = parseFloat(document.getElementById('comp-pct').value) || 0;
+  if (!inv || !cdi) return;
+
+  const cdbAnn = cdi * (cdbPct / 100);
+  const compAnn = cdi * (compPct / 100);
+  const cdbDr = dailyRate(cdbAnn);
+  const compDr = dailyRate(compAnn);
+  const IR = 22.5;
+
+  // ── Aba Parâmetros
+  const wsParams = XLSX.utils.aoa_to_sheet([
+    ['Parâmetro', 'Valor'],
+    ['Valor Investido (R$)', inv],
+    ['CDI Anual (%)', cdi],
+    ['CDB (% do CDI)', cdbPct],
+    ['Compromissada (% do CDI)', compPct],
+    ['Taxa Anual CDB (%)', cdbAnn.toFixed(4)],
+    ['Taxa Anual Compromissada (%)', compAnn.toFixed(4)],
+    ['IR Regressivo aplicado (%)', IR],
+    ['Período simulado (dias)', 35],
+  ]);
+  wsParams['!cols'] = [{ wch: 34 }, { wch: 18 }];
+
+  // ── Aba Detalhamento
+  const header = [
+    'Dia',
+    'Rend. Bruto CDB (R$)', 'IOF (R$)', 'Rend. Liquido CDB (R$)',
+    'Rend. Bruto Comp. (R$)', 'IR Comp. (R$)', 'Rend. Liquido Comp. (R$)',
+    'Diferenca Liquida (R$)', 'Vencedor'
+  ];
+  const dataRows = [];
+  let cdbAmount = inv, compAmount = inv;
+
+  for (let d = 1; d <= 35; d++) {
+    cdbAmount = cdbAmount * (1 + cdbDr);
+    compAmount = compAmount * (1 + compDr);
+    const cdbBruto = cdbAmount - inv;
+    const compBruto = compAmount - inv;
+    const iofPct = getIOFPct(d);
+    const irPct = IR / 100;
+    const iof = cdbBruto * iofPct;
+    const cdbLiq = (cdbBruto - iof) * (1 - irPct);
+    const compLiq = compBruto * (1 - irPct);
+    const diff = cdbLiq - compLiq;
+    dataRows.push([
+      d,
+      +cdbBruto.toFixed(2), +iof.toFixed(2), +cdbLiq.toFixed(2),
+      +compBruto.toFixed(2), +(compBruto * irPct).toFixed(2), +compLiq.toFixed(2),
+      +diff.toFixed(2),
+      diff > 0 ? 'CDB' : diff < 0 ? 'Compromissada' : 'Empate'
+    ]);
+  }
+
+  const wsDetail = XLSX.utils.aoa_to_sheet([header, ...dataRows]);
+  wsDetail['!cols'] = [
+    { wch: 6 },
+    { wch: 22 }, { wch: 14 }, { wch: 22 },
+    { wch: 22 }, { wch: 14 }, { wch: 22 },
+    { wch: 20 }, { wch: 14 }
+  ];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, wsParams, 'Parametros');
+  XLSX.utils.book_append_sheet(wb, wsDetail, 'Detalhamento');
+
+  const cdiStr = String(cdi).replace('.', ',');
+  XLSX.writeFile(wb, `CDB_x_Compromissada_CDI${cdiStr}.xlsx`);
+}
+
+// Init
+calcular();
+</script>
+</body>
+</html>
