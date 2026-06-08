@@ -50,9 +50,7 @@
   --shadow: 0 24px 80px rgba(0,0,0,.28);
 }
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
   font-family: 'Poppins', sans-serif;
@@ -75,9 +73,7 @@ body::before {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
 }
 
-a {
-  color: inherit;
-}
+a { color: inherit; }
 
 .page-leaving {
   animation: pageOut .25s ease forwards;
@@ -94,9 +90,7 @@ a {
 /* NAV */
 nav {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   z-index: 100;
   display: flex;
   align-items: center;
@@ -115,17 +109,13 @@ nav {
   letter-spacing: -.4px;
   white-space: nowrap;
 }
-
-.nav-brand span {
-  color: var(--amber);
-}
+.nav-brand span { color: var(--amber); }
 
 .nav-links {
   display: flex;
   align-items: center;
   gap: 24px;
 }
-
 .nav-links a {
   text-decoration: none;
   color: rgba(255,255,255,.6);
@@ -133,10 +123,7 @@ nav {
   font-weight: 650;
   transition: color .15s ease;
 }
-
-.nav-links a:hover {
-  color: #fff;
-}
+.nav-links a:hover { color: #fff; }
 
 .nav-cta {
   text-decoration: none;
@@ -176,11 +163,9 @@ nav {
   font-weight: 800;
   margin-bottom: 12px;
 }
-
 .section-label::before {
   content: '';
-  width: 6px;
-  height: 6px;
+  width: 6px; height: 6px;
   border-radius: 50%;
   background: var(--amber);
   box-shadow: 0 0 10px rgba(212,88,10,.8);
@@ -230,11 +215,9 @@ nav {
   color: var(--amber-lt);
   margin-bottom: 24px;
 }
-
 .hero-eyebrow::before {
   content: '';
-  width: 6px;
-  height: 6px;
+  width: 6px; height: 6px;
   border-radius: 50%;
   background: var(--amber);
   box-shadow: 0 0 8px var(--amber);
@@ -248,11 +231,7 @@ nav {
   letter-spacing: -3.6px;
   margin-bottom: 24px;
 }
-
-.hero-title em {
-  font-style: normal;
-  color: var(--amber);
-}
+.hero-title em { font-style: normal; color: var(--amber); }
 
 .hero-sub {
   max-width: 740px;
@@ -282,18 +261,13 @@ nav {
   font-weight: 850;
   transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
 }
-
-.btn svg {
-  width: 16px;
-  height: 16px;
-}
+.btn svg { width: 16px; height: 16px; }
 
 .btn-primary {
   background: var(--amber);
   color: #fff;
   box-shadow: 0 12px 30px rgba(212,88,10,.34);
 }
-
 .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 18px 44px rgba(212,88,10,.44);
@@ -304,7 +278,6 @@ nav {
   border: 1px solid rgba(255,255,255,.11);
   color: rgba(255,255,255,.82);
 }
-
 .btn-secondary:hover {
   transform: translateY(-2px);
   border-color: rgba(255,255,255,.2);
@@ -312,13 +285,11 @@ nav {
 }
 
 /* TOOLS */
-.tools {
-  padding-top: 32px;
-}
+.tools { padding-top: 32px; }
 
 .tools-grid {
   display: grid;
-  grid-template-columns: 1.35fr .65fr;
+  grid-template-columns: 1fr 1fr;
   gap: 18px;
 }
 
@@ -341,10 +312,8 @@ nav {
 .tool-card::after {
   content: '';
   position: absolute;
-  right: -90px;
-  bottom: -130px;
-  width: 300px;
-  height: 300px;
+  right: -90px; bottom: -130px;
+  width: 300px; height: 300px;
   background: radial-gradient(circle, rgba(212,88,10,.22), transparent 70%);
   pointer-events: none;
 }
@@ -376,17 +345,15 @@ nav {
   border-radius: 999px;
   margin-bottom: 18px;
 }
-
 .tool-tag::before {
   content: '';
-  width: 6px;
-  height: 6px;
+  width: 6px; height: 6px;
   border-radius: 50%;
   background: var(--amber);
 }
 
 .tool-title {
-  font-size: clamp(27px, 3vw, 38px);
+  font-size: clamp(22px, 2.4vw, 32px);
   line-height: 1.08;
   letter-spacing: -1.2px;
   font-weight: 880;
@@ -416,7 +383,6 @@ nav {
   font-size: 13px;
   line-height: 1.55;
 }
-
 .tool-list div::before {
   content: '✓';
   color: var(--amber-lt);
@@ -443,8 +409,7 @@ nav {
 }
 
 .tool-arrow {
-  width: 42px;
-  height: 42px;
+  width: 42px; height: 42px;
   border-radius: 13px;
   background: rgba(212,88,10,.16);
   display: flex;
@@ -452,79 +417,9 @@ nav {
   justify-content: center;
   transition: background .15s ease;
 }
-
-.tool-arrow svg {
-  width: 17px;
-  height: 17px;
-  color: var(--amber-lt);
-}
-
-.tool-card:hover .tool-arrow {
-  background: var(--amber);
-}
-
-.tool-card:hover .tool-arrow svg {
-  color: #fff;
-}
-
-.soon-card {
-  min-height: 350px;
-  border: 1px dashed rgba(255,255,255,.15);
-  border-radius: 24px;
-  padding: 26px;
-  background: rgba(255,255,255,.03);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.soon-badge {
-  display: inline-flex;
-  align-self: flex-start;
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.08);
-  color: rgba(255,255,255,.48);
-  font-size: 10px;
-  font-weight: 850;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-  padding: 6px 10px;
-  border-radius: 999px;
-  margin-bottom: 18px;
-}
-
-.soon-title {
-  font-size: 22px;
-  line-height: 1.18;
-  font-weight: 850;
-  letter-spacing: -.7px;
-  margin-bottom: 10px;
-}
-
-.soon-sub {
-  color: rgba(255,255,255,.45);
-  font-size: 13px;
-  line-height: 1.7;
-}
-
-.soon-status {
-  display: inline-flex;
-  align-items: center;
-  align-self: flex-start;
-  gap: 8px;
-  color: var(--amber-lt);
-  font-size: 13px;
-  font-weight: 850;
-}
-
-.soon-status::before {
-  content: '';
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--amber);
-  box-shadow: 0 0 10px rgba(212,88,10,.75);
-}
+.tool-arrow svg { width: 17px; height: 17px; color: var(--amber-lt); }
+.tool-card:hover .tool-arrow { background: var(--amber); }
+.tool-card:hover .tool-arrow svg { color: #fff; }
 
 /* ABOUT */
 .about {
@@ -550,8 +445,7 @@ nav {
 }
 
 .profile-avatar {
-  width: 82px;
-  height: 82px;
+  width: 82px; height: 82px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--navy), var(--steel));
   display: flex;
@@ -563,11 +457,7 @@ nav {
   margin-bottom: 18px;
 }
 
-.profile-name {
-  font-size: 18px;
-  font-weight: 850;
-  margin-bottom: 6px;
-}
+.profile-name { font-size: 18px; font-weight: 850; margin-bottom: 6px; }
 
 .profile-role {
   color: rgba(255,255,255,.5);
@@ -591,7 +481,6 @@ nav {
   font-weight: 800;
   transition: background .15s ease, border-color .15s ease, transform .15s ease;
 }
-
 .profile-link:hover {
   transform: translateY(-2px);
   background: rgba(255,255,255,.07);
@@ -604,24 +493,16 @@ nav {
   letter-spacing: -1.6px;
   margin-bottom: 16px;
 }
-
 .about-text p {
   max-width: 800px;
   color: rgba(255,255,255,.62);
   font-size: 14px;
   line-height: 1.85;
 }
-
-.about-text p + p {
-  margin-top: 12px;
-}
+.about-text p + p { margin-top: 12px; }
 
 /* ROADMAP */
-.roadmap-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
+.roadmap-grid { display: flex; flex-wrap: wrap; gap: 10px; }
 
 .roadmap-pill {
   border: 1px solid rgba(255,255,255,.09);
@@ -648,117 +529,36 @@ footer {
   color: rgba(255,255,255,.36);
   font-size: 12px;
 }
+.footer-inner span { color: var(--amber-lt); }
 
-.footer-inner span {
-  color: var(--amber-lt);
-}
-
-.footer-links {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.footer-links a {
-  text-decoration: none;
-  color: rgba(255,255,255,.46);
-}
-
-.footer-links a:hover {
-  color: #fff;
-}
+.footer-links { display: flex; align-items: center; gap: 16px; }
+.footer-links a { text-decoration: none; color: rgba(255,255,255,.46); }
+.footer-links a:hover { color: #fff; }
 
 /* RESPONSIVE */
 @media (max-width: 980px) {
-  nav {
-    padding: 15px 28px;
-  }
-
-  .nav-links {
-    display: none;
-  }
-
-  .container {
-    width: min(100% - 40px, 1120px);
-  }
-
-  .hero {
-    min-height: auto;
-    padding: 112px 0 52px;
-  }
-
-  .hero-title {
-    letter-spacing: -2.3px;
-  }
-
-  .tools-grid,
-  .about-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .soon-card {
-    min-height: 230px;
-  }
+  nav { padding: 15px 28px; }
+  .nav-links { display: none; }
+  .container { width: min(100% - 40px, 1120px); }
+  .hero { min-height: auto; padding: 112px 0 52px; }
+  .hero-title { letter-spacing: -2.3px; }
+  .tools-grid, .about-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 620px) {
-  .container {
-    width: min(100% - 32px, 1120px);
-  }
-
-  nav {
-    padding: 14px 16px;
-  }
-
-  .nav-brand {
-    font-size: 14px;
-  }
-
-  .nav-cta {
-    display: none;
-  }
-
-  .hero {
-    padding-top: 98px;
-  }
-
-  .hero-title {
-    font-size: 42px;
-    letter-spacing: -1.5px;
-  }
-
-  .hero-sub {
-    font-size: 14px;
-  }
-
-  .hero-actions {
-    align-items: stretch;
-  }
-
-  .btn {
-    width: 100%;
-  }
-
-  .section {
-    padding: 54px 0;
-  }
-
-  .tool-card,
-  .soon-card {
-    min-height: auto;
-  }
-
-  .tool-header,
-  .tool-list,
-  .tool-footer {
-    padding-left: 22px;
-    padding-right: 22px;
-  }
-
-  .footer-inner {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+  .container { width: min(100% - 32px, 1120px); }
+  nav { padding: 14px 16px; }
+  .nav-brand { font-size: 14px; }
+  .nav-cta { display: none; }
+  .hero { padding-top: 98px; }
+  .hero-title { font-size: 42px; letter-spacing: -1.5px; }
+  .hero-sub { font-size: 14px; }
+  .hero-actions { align-items: stretch; }
+  .btn { width: 100%; }
+  .section { padding: 54px 0; }
+  .tool-card { min-height: auto; }
+  .tool-header, .tool-list, .tool-footer { padding-left: 22px; padding-right: 22px; }
+  .footer-inner { flex-direction: column; align-items: flex-start; }
 }
 </style>
 </head>
@@ -767,13 +567,11 @@ footer {
 
 <nav>
   <a href="#" class="nav-brand">Conta<span>com</span>Nico</a>
-
   <div class="nav-links">
     <a href="#ferramentas">Ferramentas</a>
     <a href="#nico">Quem é o Nico?</a>
     <a href="#roadmap">Próximas</a>
   </div>
-
   <a href="#ferramentas" class="nav-cta">Acessar ferramenta</a>
 </nav>
 
@@ -784,28 +582,22 @@ footer {
     <div class="container">
       <div class="hero-inner">
         <div class="hero-eyebrow">Ferramentas abertas · Finanças corporativas</div>
-
         <h1 class="hero-title">
           Finanças corporativas<br>
           sem <em>caixa-preta</em>.
         </h1>
-
         <p class="hero-sub">
           Simuladores e planilhas criados a partir de problemas reais de Tesouraria,
           Gestão de Caixa e Investimentos Corporativos.
         </p>
-
         <div class="hero-actions">
           <a href="#ferramentas" class="btn btn-primary">
-            Acessar ferramenta disponível
+            Acessar ferramentas disponíveis
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </a>
-
-          <a href="#nico" class="btn btn-secondary">
-            Quem é o Nico?
-          </a>
+          <a href="#nico" class="btn btn-secondary">Quem é o Nico?</a>
         </div>
       </div>
     </div>
@@ -819,6 +611,7 @@ footer {
       </div>
 
       <div class="tools-grid">
+
         <a href="simulador-cdb/" class="tool-card">
           <div class="tool-header">
             <div class="tool-tag">Disponível agora</div>
@@ -828,14 +621,12 @@ footer {
               realmente entrega o melhor resultado.
             </p>
           </div>
-
           <div class="tool-list">
             <div>Comparação entre duas alternativas de CDB</div>
             <div>Cálculo de retorno bruto e líquido</div>
             <div>Efeito do prazo na alíquota de IR regressivo</div>
             <div>Download da planilha para validação e uso próprio</div>
           </div>
-
           <div class="tool-footer">
             <span class="tool-cta">Acessar ferramenta</span>
             <span class="tool-arrow">
@@ -846,19 +637,31 @@ footer {
           </div>
         </a>
 
-        <div class="soon-card">
-          <div>
-            <div class="soon-badge">Em breve</div>
-            <h3 class="soon-title">Compromissada x CDB</h3>
-            <p class="soon-sub">
-              Comparativo para avaliar liquidez, taxa, imposto e retorno líquido em aplicações comuns do caixa corporativo.
+        <a href="simulador-cdb-compromissada/" class="tool-card">
+          <div class="tool-header">
+            <div class="tool-tag">Disponível agora</div>
+            <h3 class="tool-title">CDB x Compromissada</h3>
+            <p class="tool-sub">
+              Descubra quando a Compromissada, mesmo pagando menos CDI, entrega mais no líquido
+              por ser isenta de IOF em qualquer prazo.
             </p>
           </div>
-
-          <div class="soon-status">
-            Em desenvolvimento
+          <div class="tool-list">
+            <div>Comparativo de rendimento líquido dia a dia</div>
+            <div>IOF calculado por tabela regressiva (D1 a D29)</div>
+            <div>IR regressivo aplicado automaticamente</div>
+            <div>Identificação do dia exato em que o CDB vira o jogo</div>
           </div>
-        </div>
+          <div class="tool-footer">
+            <span class="tool-cta">Acessar ferramenta</span>
+            <span class="tool-arrow">
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+        </a>
+
       </div>
     </div>
   </section>
@@ -872,30 +675,23 @@ footer {
         <div class="profile-role">
           Finanças Corporativas · Tesouraria · Gestão de Caixa · Investimentos · Automação
         </div>
-
         <a href="https://www.linkedin.com/in/nicolasllopes/" target="_blank" rel="noopener noreferrer" class="profile-link">
           Ver LinkedIn
         </a>
       </div>
-
       <div class="about-text">
         <div class="section-label">Quem é o Nico?</div>
         <h2>Ferramentas simples para análises financeiras do dia a dia.</h2>
-
         <p>
           Formado em Ciências Econômicas, sou profissional de Finanças Corporativas com atuação em Tesouraria, Gestão de Caixa,
           Investimentos e Automação Financeira.
         </p>
-
         <p>
           Criei o ContaComNico para compartilhar simuladores, planilhas e conteúdos práticos que
           ajudem profissionais financeiros a compararem cenários, entenderem premissas e tomarem
           decisões com mais clareza.
         </p>
-
-        <p>
-          Tudo aqui nasce de situações reais vividas no dia a dia corporativo.
-        </p>
+        <p>Tudo aqui nasce de situações reais vividas no dia a dia corporativo.</p>
       </div>
     </div>
   </section>
@@ -907,13 +703,11 @@ footer {
         <div class="section-label">Próximas ferramentas</div>
         <h2 class="section-title">O projeto vai crescer por etapas.</h2>
         <p class="section-sub">
-          A primeira ferramenta já está disponível. As próximas serão criadas a partir de temas
+          Duas ferramentas já estão disponíveis. As próximas serão criadas a partir de temas
           recorrentes da rotina financeira corporativa.
         </p>
       </div>
-
       <div class="roadmap-grid">
-        <div class="roadmap-pill">Compromissada x CDB</div>
         <div class="roadmap-pill">Fundo RF x CDB</div>
         <div class="roadmap-pill">Escada de Liquidez</div>
         <div class="roadmap-pill">Caixa Mínimo Operacional</div>
@@ -926,10 +720,7 @@ footer {
 
 <footer>
   <div class="container footer-inner">
-    <div>
-      Feito com propósito · <span>ContaComNico</span> · Lab Financeiro
-    </div>
-
+    <div>Feito com propósito · <span>ContaComNico</span> · Lab Financeiro</div>
     <div class="footer-links">
       <a href="#ferramentas">Ferramentas</a>
       <a href="#nico">Quem é o Nico?</a>
@@ -943,10 +734,8 @@ document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
   anchor.addEventListener('click', function(e) {
     var targetId = this.getAttribute('href');
     if (!targetId || targetId === '#') return;
-
     var target = document.querySelector(targetId);
     if (!target) return;
-
     e.preventDefault();
     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
@@ -955,13 +744,9 @@ document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
 document.querySelectorAll('a.tool-card').forEach(function(link) {
   link.addEventListener('click', function(e) {
     e.preventDefault();
-
     var href = this.href;
     document.body.classList.add('page-leaving');
-
-    setTimeout(function() {
-      window.location.href = href;
-    }, 250);
+    setTimeout(function() { window.location.href = href; }, 250);
   });
 });
 </script>
