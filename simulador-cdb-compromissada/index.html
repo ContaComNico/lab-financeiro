@@ -1123,6 +1123,7 @@ function exportarExcel() {
      { font: { name:'Poppins', italic:true, sz:9, color:{ rgb: MUTED } },
        alignment: { horizontal:'left', vertical:'center' } });
 
+  ws['!sheetViews'] = [{ showGridLines: false }];
   ws['!ref'] = XLSX.utils.encode_range({ s:{r:2,c:1}, e:{r:53,c:8} });
   autofit(ws);
   XLSX.utils.book_append_sheet(wb, ws, 'Análise');
@@ -1173,6 +1174,7 @@ function exportarExcel() {
   }
 
   ws2['!ref'] = XLSX.utils.encode_range({ s:{r:1,c:1}, e:{r:37,c:4} });
+  ws2['!sheetViews'] = [{ showGridLines: false }];
 
   // Nota rodapé
   ws2[XLSX.utils.encode_cell({r:37,c:1})] = {
