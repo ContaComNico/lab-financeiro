@@ -917,7 +917,25 @@ function exportarExcel() {
   const cdbDr   = dailyRate(cdbAnn);
   const compDr  = dailyRate(compAnn);
 
-  // ── PALETA
+  // ── AUTOFIT: calcula largura mínima de cada coluna pelo conteúdo
+  function autofit(ws) {
+    const cols = {};
+    Object.keys(ws).forEach(addr => {
+      if (addr.startsWith('!')) return;
+      const cell = ws[addr];
+      const ref  = XLSX.utils.decode_cell(addr);
+      const col  = ref.c;
+      const val  = cell.v != null ? String(cell.v) : '';
+      // chars + margem; células de R$ têm prefixo longo
+      const len  = val.startsWith('R$') ? val.length + 2 : val.length + 2;
+      cols[col]  = Math.max(cols[col] || 0, Math.min(len, 40));
+    });
+    ws['!cols'] = Object.keys(cols)
+      .sort((a,b) => a-b)
+      .reduce((arr, c) => { arr[+c] = { wch: cols[c] }; return arr; }, []);
+  }
+
+
   const MIDNIGHT   = 'FF0D1B2A';
   const NAVY       = 'FF1E3A5F';
   const NAVY_FILL  = 'FFD4E4F0';
@@ -1106,6 +1124,7 @@ function exportarExcel() {
        alignment: { horizontal:'left', vertical:'center' } });
 
   ws['!ref'] = XLSX.utils.encode_range({ s:{r:2,c:1}, e:{r:53,c:8} });
+  autofit(ws);
   XLSX.utils.book_append_sheet(wb, ws, 'Análise');
 
   // ══════════════════════════════════════
@@ -1164,6 +1183,7 @@ function exportarExcel() {
   };
 
   XLSX.utils.book_append_sheet(wb, ws2, 'Curva Diária');
+  autofit(ws2);
 
   // ══════════════════════════════════════
   // EXPORTAR
