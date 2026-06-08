@@ -6,7 +6,7 @@
   <title>CDB vs Compromissada | Lab Financeiro</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <style>
     :root {
       --midnight: #0D1B2A;
@@ -906,74 +906,268 @@ function calcular() {
 }
 
 function exportarExcel() {
-  const inv = parseInvestment(document.getElementById('investment').value);
-  const cdi = parseFloat(document.getElementById('cdi').value) || 0;
-  const cdbPct = parseFloat(document.getElementById('cdb-pct').value) || 0;
+  const inv     = parseInvestment(document.getElementById('investment').value);
+  const cdi     = parseFloat(document.getElementById('cdi').value) || 0;
+  const cdbPct  = parseFloat(document.getElementById('cdb-pct').value) || 0;
   const compPct = parseFloat(document.getElementById('comp-pct').value) || 0;
   if (!inv || !cdi) return;
 
-  const cdbAnn = cdi * (cdbPct / 100);
+  const cdbAnn  = cdi * (cdbPct  / 100);
   const compAnn = cdi * (compPct / 100);
-  const cdbDr = dailyRate(cdbAnn);
-  const compDr = dailyRate(compAnn);
-  const IR = 22.5;
+  const cdbDr   = dailyRate(cdbAnn);
+  const compDr  = dailyRate(compAnn);
 
-  // ── Aba Parâmetros
-  const wsParams = XLSX.utils.aoa_to_sheet([
-    ['Parâmetro', 'Valor'],
-    ['Valor Investido (R$)', inv],
-    ['CDI Anual (%)', cdi],
-    ['CDB (% do CDI)', cdbPct],
-    ['Compromissada (% do CDI)', compPct],
-    ['Taxa Anual CDB (%)', cdbAnn.toFixed(4)],
-    ['Taxa Anual Compromissada (%)', compAnn.toFixed(4)],
-    ['IR Regressivo aplicado (%)', IR],
-    ['Período simulado (dias)', 35],
-  ]);
-  wsParams['!cols'] = [{ wch: 34 }, { wch: 18 }];
+  // ── PALETA
+  const MIDNIGHT   = 'FF0D1B2A';
+  const NAVY       = 'FF1E3A5F';
+  const NAVY_FILL  = 'FFD4E4F0';
+  const AMBER      = 'FFD4580A';
+  const AMBER_FILL = 'FFFAD4B8';
+  const CLOUD      = 'FFF5F7FA';
+  const MUTED      = 'FF8896A9';
+  const WHITE      = 'FFFFFFFF';
+  const IOF_RED    = 'FFF87171';
 
-  // ── Aba Detalhamento
-  const header = [
-    'Dia',
-    'Rend. Bruto CDB (R$)', 'IOF (R$)', 'Rend. Liquido CDB (R$)',
-    'Rend. Bruto Comp. (R$)', 'IR Comp. (R$)', 'Rend. Liquido Comp. (R$)',
-    'Diferenca Liquida (R$)', 'Vencedor'
-  ];
-  const dataRows = [];
-  let cdbAmount = inv, compAmount = inv;
+  const fmtBRL = '"R$ "#,##0.00';
+  const fmtPct = '0.00%';
+  const fmtPct4 = '0.0000%';
 
-  for (let d = 1; d <= 35; d++) {
-    cdbAmount = cdbAmount * (1 + cdbDr);
-    compAmount = compAmount * (1 + compDr);
-    const cdbBruto = cdbAmount - inv;
-    const compBruto = compAmount - inv;
-    const iofPct = getIOFPct(d);
-    const irPct = IR / 100;
-    const iof = cdbBruto * iofPct;
-    const cdbLiq = (cdbBruto - iof) * (1 - irPct);
-    const compLiq = compBruto * (1 - irPct);
-    const diff = cdbLiq - compLiq;
-    dataRows.push([
-      d,
-      +cdbBruto.toFixed(2), +iof.toFixed(2), +cdbLiq.toFixed(2),
-      +compBruto.toFixed(2), +(compBruto * irPct).toFixed(2), +compLiq.toFixed(2),
-      +diff.toFixed(2),
-      diff > 0 ? 'CDB' : diff < 0 ? 'Compromissada' : 'Empate'
-    ]);
+  function style(bold, fgColor, bgColor, hAlign, numFmt, borderColor) {
+    const bc = borderColor || 'FF0D1B2A';
+    return {
+      font:      { name: 'Poppins', bold: !!bold, color: { rgb: fgColor || 'FFFFFFFF' }, sz: 11 },
+      fill:      bgColor ? { fgColor: { rgb: bgColor }, patternType: 'solid' } : { patternType: 'none' },
+      alignment: { horizontal: hAlign || 'center', vertical: 'center' },
+      border: {
+        left:   { style: 'thin', color: { rgb: bc } },
+        right:  { style: 'thin', color: { rgb: bc } },
+        top:    { style: 'thin', color: { rgb: bc } },
+        bottom: { style: 'thin', color: { rgb: bc } }
+      },
+      numFmt: numFmt || 'General'
+    };
   }
 
-  const wsDetail = XLSX.utils.aoa_to_sheet([header, ...dataRows]);
-  wsDetail['!cols'] = [
-    { wch: 6 },
-    { wch: 22 }, { wch: 14 }, { wch: 22 },
-    { wch: 22 }, { wch: 14 }, { wch: 22 },
-    { wch: 20 }, { wch: 14 }
+  const wb = XLSX.utils.book_new();
+
+  // ══════════════════════════════════════
+  // ABA 1 — ANÁLISE
+  // ══════════════════════════════════════
+  const ws = {};
+  const range = { s: { c: 1, r: 1 }, e: { c: 8, r: 52 } };
+
+  function sc(r, c, v, s) {
+    const addr = XLSX.utils.encode_cell({ r, c });
+    ws[addr] = { v, t: typeof v === 'number' ? 'n' : 's', s };
+  }
+
+  // Row heights & col widths
+  ws['!rows'] = [];
+  for (let i = 0; i < 55; i++) ws['!rows'].push({ hpt: 15 });
+  ws['!rows'][1] = { hpt: 7.5 };
+  ws['!rows'][2] = { hpt: 25.5 };
+  ws['!rows'][3] = { hpt: 21.75 };
+  ws['!rows'][4] = { hpt: 18 };
+  ws['!rows'][5] = { hpt: 18 };
+  ws['!rows'][6] = { hpt: 18 };
+  ws['!rows'][7] = { hpt: 7.5 };
+  ws['!rows'][8] = { hpt: 18 };
+  ws['!rows'][9] = { hpt: 18 };
+  for (let i = 10; i < 14; i++) ws['!rows'][i] = { hpt: 4 };
+  ws['!rows'][14] = { hpt: 25.5 };
+  ws['!rows'][15] = { hpt: 19.5 };
+  ws['!rows'][16] = { hpt: 18 };
+
+  ws['!cols'] = [
+    { wch: 1.5 },   // A
+    { wch: 29 },    // B — label
+    { wch: 1.5 },   // C — sep
+    { wch: 16.2 },  // D — CDB
+    { wch: 17.8 },  // E — Comp
+    { wch: 1.5 },   // F
+    { wch: 1.5 },   // G
+    { wch: 1.5 },   // H
+    { wch: 1.5 },   // I
   ];
 
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, wsParams, 'Parametros');
-  XLSX.utils.book_append_sheet(wb, wsDetail, 'Detalhamento');
+  // ── Linha 2: título Parâmetros
+  sc(2, 1, '  Parâmetros de Entrada', style(true, WHITE, MIDNIGHT, 'left'));
+  for (let c = 2; c <= 4; c++) sc(2, c, '', style(false, WHITE, MIDNIGHT, 'center'));
+  ws['!merges'] = [{ s:{r:2,c:1}, e:{r:2,c:4} }];
 
+  // ── Linha 3: headers
+  sc(3, 1, 'Parâmetro',     style(true, 'FF0D1B2A', CLOUD,  'center'));
+  sc(3, 2, '',              style(false,'FF0D1B2A', CLOUD,  'center'));
+  sc(3, 3, 'CDB',           style(true, WHITE,      NAVY,   'center'));
+  sc(3, 4, 'Compromissada', style(true, WHITE,      AMBER,  'center'));
+
+  // ── Linha 4: Valor Investido (D4:E4 merged)
+  sc(4, 1, 'Valor Investido (R$)', style(false,'FF0D1B2A', null,       'left'));
+  sc(4, 2, '',                     style(false, WHITE,     null,       'center'));
+  sc(4, 3, inv,                    style(true,  'FF1E3A5F',null,       'center', fmtBRL));
+  sc(4, 4, inv,                    style(false, AMBER,     AMBER_FILL, 'center', fmtBRL));
+  ws['!merges'].push({ s:{r:4,c:3}, e:{r:4,c:4} }); // D4:E4 — visual only
+
+  // ── Linha 5: CDI Anual
+  sc(5, 1, 'CDI Anual (%)',  style(false,'FF0D1B2A', null,       'left'));
+  sc(5, 2, '',               style(false, WHITE,     null,       'center'));
+  sc(5, 3, cdi/100,          style(true,  'FF1E3A5F',null,       'center', fmtPct));
+  sc(5, 4, cdi/100,          style(false, AMBER,     AMBER_FILL, 'center', fmtPct));
+
+  // ── Linha 6: % CDI
+  sc(6, 1, '% do CDI negociado', style(false,'FF0D1B2A', null, 'left'));
+  sc(6, 2, '',                   style(false, WHITE,     null, 'center'));
+  sc(6, 3, cdbPct/100,           style(true,  'FF1E3A5F',null, 'right', fmtPct));
+  sc(6, 4, compPct/100,          style(true,  AMBER,     null, 'right', fmtPct));
+
+  // ── Linha 7: espaçador
+  for (let c = 1; c <= 4; c++) sc(7, c, '', style(false, WHITE, null, 'center'));
+
+  // ── Linha 8: Taxa Anual
+  sc(8, 1, 'Taxa Anual Efetiva (%)', style(false,'FF0D1B2A', null,       'left'));
+  sc(8, 2, '',                       style(false, WHITE,     null,       'center'));
+  sc(8, 3, cdbAnn/100,               style(true,  'FF1E3A5F',NAVY_FILL, 'right', fmtPct4));
+  sc(8, 4, compAnn/100,              style(true,  AMBER,     AMBER_FILL,'right', fmtPct4));
+
+  // ── Linha 9: Taxa Diária
+  const cdbDrVal  = Math.pow(1 + cdbAnn/100,  1/252) - 1;
+  const compDrVal = Math.pow(1 + compAnn/100, 1/252) - 1;
+  sc(9, 1, 'Taxa Diária',  style(false,'FF0D1B2A', null,       'left'));
+  sc(9, 2, '',             style(false, WHITE,     null,       'center'));
+  sc(9, 3, cdbDrVal,       style(true,  'FF1E3A5F',NAVY_FILL, 'right', fmtPct4));
+  sc(9, 4, compDrVal,      style(true,  AMBER,     AMBER_FILL,'right', fmtPct4));
+
+  // ── Linhas 10–13: espaçadores
+  for (let r = 10; r <= 13; r++)
+    for (let c = 1; c <= 4; c++) sc(r, c, '', style(false, WHITE, null, 'center'));
+
+  // ── Linha 14: título Detalhamento
+  sc(14, 1, 'Evolução de Rendimento', style(true, WHITE, MIDNIGHT, 'center'));
+  for (let c = 2; c <= 8; c++) sc(14, c, '', style(false, WHITE, MIDNIGHT, 'center'));
+  ws['!merges'].push({ s:{r:14,c:1}, e:{r:14,c:8} });
+
+  // ── Linha 15: grupos cabeçalho
+  sc(15, 1, 'Dia',               style(true, 'FF0D1B2A', CLOUD, 'center'));
+  sc(15, 2, '',                  style(false,'FF0D1B2A', CLOUD, 'center'));
+  sc(15, 3, '📄  CDB',           style(true, WHITE,      NAVY,  'center'));
+  sc(15, 4, '',                  style(false,WHITE,      NAVY,  'center'));
+  sc(15, 5, '🔄  Compromissada', style(true, WHITE,      AMBER, 'center'));
+  sc(15, 6, '',                  style(false,WHITE,      AMBER, 'center'));
+  sc(15, 7, '',                  style(false,'FF0D1B2A', CLOUD, 'center'));
+  sc(15, 8, '⚖  Resultado',      style(true, 'FF0D1B2A', CLOUD, 'center'));
+  ws['!merges'].push({ s:{r:15,c:3}, e:{r:15,c:4} });
+  ws['!merges'].push({ s:{r:15,c:5}, e:{r:15,c:6} });
+
+  // ── Linha 16: subcolunas
+  sc(16, 1, 'Dia',         style(true, MUTED,         CLOUD, 'center'));
+  sc(16, 2, '',            style(false,'FF0D1B2A',    CLOUD, 'center'));
+  sc(16, 3, 'Rend. Bruto', style(true, WHITE,         NAVY,  'center'));
+  sc(16, 4, 'Rend. Líq.',  style(true, WHITE,         NAVY,  'center'));
+  sc(16, 5, 'Rend. Bruto', style(true, WHITE,         AMBER, 'center'));
+  sc(16, 6, 'Rend. Líq.',  style(true, WHITE,         AMBER, 'center'));
+  sc(16, 7, '',            style(false,'FF0D1B2A',    CLOUD, 'center'));
+  sc(16, 8, 'Vencedor',    style(true, 'FF0D1B2A',   CLOUD, 'center'));
+
+  // ── Linhas 17–51: dados dias 1–35
+  let cdbAmt = inv, compAmt = inv;
+  for (let i = 0; i < 35; i++) {
+    const row  = 17 + i;
+    const day  = i + 1;
+    cdbAmt  *= (1 + cdbDr);
+    compAmt *= (1 + compDr);
+    const cdbBruto  = cdbAmt  - inv;
+    const compBruto = compAmt - inv;
+    const iofPct    = getIOFPct(day);
+    const irPct     = getIRPct(day, 22.5, 20, 17.5, 15);
+    const iof       = cdbBruto * iofPct;
+    const cdbLiq    = (cdbBruto - iof) * (1 - irPct);
+    const compLiq   = compBruto * (1 - irPct);
+    const diff      = cdbLiq - compLiq;
+    const isIof     = iofPct > 0;
+    const dayColor  = isIof ? IOF_RED : MUTED;
+
+    sc(row, 1, day,      style(isIof, dayColor,    null,       'center'));
+    sc(row, 2, '',       style(false, WHITE,        null,       'center'));
+    sc(row, 3, +cdbBruto.toFixed(2),  style(false, isIof ? IOF_RED : 'FF1E3A5F', null, 'right', fmtBRL));
+    sc(row, 4, +cdbLiq.toFixed(2),    style(true,  isIof ? IOF_RED : 'FF1E3A5F', isIof ? null : NAVY_FILL, 'right', fmtBRL));
+    sc(row, 5, +compBruto.toFixed(2), style(false, AMBER,     null,       'right', fmtBRL));
+    sc(row, 6, +compLiq.toFixed(2),   style(true,  AMBER,     AMBER_FILL, 'right', fmtBRL));
+    sc(row, 7, '',       style(false, WHITE, null, 'center'));
+    const winner = diff > 0 ? 'CDB' : diff < 0 ? 'Compromissada' : 'Empate';
+    sc(row, 8, winner,   style(true,  'FF1E3A5F', null, 'center'));
+  }
+
+  // ── Linha 52: espaçador
+  for (let c = 1; c <= 8; c++) sc(52, c, '', style(false, WHITE, null, 'center'));
+
+  // ── Linha 53: nota rodapé
+  sc(53, 1, 'Simulação para fins educacionais · ContaComNico · Lab Financeiro · IOF tabela regressiva (D1–D29) · IR regressivo automático',
+     { font: { name:'Poppins', italic:true, sz:9, color:{ rgb: MUTED } },
+       alignment: { horizontal:'left', vertical:'center' } });
+
+  ws['!ref'] = XLSX.utils.encode_range({ s:{r:2,c:1}, e:{r:53,c:8} });
+  XLSX.utils.book_append_sheet(wb, ws, 'Análise');
+
+  // ══════════════════════════════════════
+  // ABA 2 — CURVA DIÁRIA (tabela de dados)
+  // ══════════════════════════════════════
+  const ws2 = {};
+  ws2['!rows'] = [];
+  for (let i = 0; i < 40; i++) ws2['!rows'].push({ hpt: 15 });
+  ws2['!rows'][1] = { hpt: 25.5 };
+  ws2['!rows'][2] = { hpt: 19.5 };
+  ws2['!cols'] = [{ wch:1.5 },{ wch:8 },{ wch:20 },{ wch:20 },{ wch:20 }];
+  ws2['!merges'] = [{ s:{r:1,c:1}, e:{r:1,c:4} }];
+
+  function sc2(r, c, v, s) {
+    ws2[XLSX.utils.encode_cell({ r, c })] = { v, t: typeof v==='number'?'n':'s', s };
+  }
+
+  sc2(1, 1, '  Rendimento Líquido — CDB × Compromissada · Dia a Dia', style(true, WHITE, MIDNIGHT, 'left'));
+  for (let c = 2; c <= 4; c++) sc2(1, c, '', style(false, WHITE, MIDNIGHT, 'center'));
+
+  sc2(2, 1, 'Dia',                          style(true, 'FF0D1B2A', CLOUD, 'center'));
+  sc2(2, 2, 'Rend. Líq. CDB (R$)',          style(true, WHITE,      NAVY,  'center'));
+  sc2(2, 3, 'Rend. Líq. Compromissada (R$)',style(true, WHITE,      AMBER, 'center'));
+  sc2(2, 4, 'Diferença (R$)',               style(true, 'FF0D1B2A', CLOUD, 'center'));
+
+  // Recalcular para a aba de curva
+  let cdbA2 = inv, compA2 = inv;
+  for (let i = 0; i < 35; i++) {
+    const row   = 3 + i;
+    const day   = i + 1;
+    cdbA2  *= (1 + cdbDr);
+    compA2 *= (1 + compDr);
+    const cdbBruto  = cdbA2  - inv;
+    const compBruto = compA2 - inv;
+    const iofPct = getIOFPct(day);
+    const irPct  = getIRPct(day, 22.5, 20, 17.5, 15);
+    const cdbLiq  = (cdbBruto - iofPct * cdbBruto) * (1 - irPct);
+    const compLiq = compBruto * (1 - irPct);
+    const diff    = cdbLiq - compLiq;
+    const isIof   = iofPct > 0;
+    const dColor  = isIof ? IOF_RED : MUTED;
+    sc2(row, 1, day,                  style(isIof, dColor,    null,       'center'));
+    sc2(row, 2, +cdbLiq.toFixed(2),   style(false, 'FF1E3A5F',null,       'right', fmtBRL));
+    sc2(row, 3, +compLiq.toFixed(2),  style(false, AMBER,     AMBER_FILL, 'right', fmtBRL));
+    sc2(row, 4, +diff.toFixed(2),     style(true,  isIof ? IOF_RED : 'FF1E3A5F', null, 'right', fmtBRL));
+  }
+
+  ws2['!ref'] = XLSX.utils.encode_range({ s:{r:1,c:1}, e:{r:37,c:4} });
+
+  // Nota rodapé
+  ws2[XLSX.utils.encode_cell({r:37,c:1})] = {
+    v: 'CDB em azul · Compromissada em âmbar · O cruzamento das linhas marca a virada competitiva',
+    t: 's',
+    s: { font:{ name:'Poppins', italic:true, sz:9, color:{ rgb: MUTED } },
+         alignment:{ horizontal:'left', vertical:'center' } }
+  };
+
+  XLSX.utils.book_append_sheet(wb, ws2, 'Curva Diária');
+
+  // ══════════════════════════════════════
+  // EXPORTAR
+  // ══════════════════════════════════════
   const cdiStr = String(cdi).replace('.', ',');
   XLSX.writeFile(wb, `CDB_x_Compromissada_CDI${cdiStr}.xlsx`);
 }
