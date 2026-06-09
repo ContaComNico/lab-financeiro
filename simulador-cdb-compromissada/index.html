@@ -570,10 +570,9 @@
         <div class="field-note">Isenta de IOF em qualquer prazo</div>
       </div>
 
-      <!-- Botão -->
-      <div class="field btn-field" style="display:flex; gap:10px;">
-        <button class="btn-calc" style="flex:1;" onclick="calcular()">⚡ Calcular</button>
-        <button class="btn-export" onclick="exportarExcel()" id="btn-export-top" style="display:none;">⬇ Excel</button>
+      <!-- Botão Excel -->
+      <div class="field btn-field">
+        <button class="btn-export" onclick="exportarExcel()" id="btn-export-top" style="width:100%;">⬇ Exportar Excel</button>
       </div>
     </div>
 
@@ -901,8 +900,6 @@ function calcular() {
   });
 
   document.getElementById('results-section').style.display = 'block';
-  document.getElementById('btn-export-top').style.display = 'inline-flex';
-  document.getElementById('results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function exportarExcel() {
@@ -1194,8 +1191,12 @@ function exportarExcel() {
   XLSX.writeFile(wb, `CDB_x_Compromissada_CDI${cdiStr}.xlsx`);
 }
 
-// Init
+// Init — calcula imediatamente e recalcula a cada mudança
 calcular();
+['investment', 'cdi', 'cdb-pct', 'comp-pct'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', calcular);
+});
 </script>
 </body>
 </html>
