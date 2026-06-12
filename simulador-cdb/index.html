@@ -371,7 +371,7 @@ label{display:block;margin-bottom:5px;font-size:11px;font-weight:700;color:#888;
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
               <div>
                 <div class="sec-title" style="margin-bottom:8px">Montante Liquido Final</div>
-                <div style="position:relative;height:180px"><canvas id="chartModelMont"></canvas></div>
+                <div style="position:relative;height:180px;width:100%"><canvas id="chartModelMont"></canvas></div>
                 <div style="display:flex;justify-content:center;gap:12px;margin-top:8px;font-size:11px;color:var(--text3)">
                   <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#1E3A5F;display:inline-block"></span>A+Reinvest.</span>
                   <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#D4580A;display:inline-block"></span>Opcao B</span>
@@ -379,7 +379,7 @@ label{display:block;margin-bottom:5px;font-size:11px;font-weight:700;color:#888;
               </div>
               <div>
                 <div class="sec-title" style="margin-bottom:8px">Ganho Liquido · IR Total Pago</div>
-                <div style="position:relative;height:180px"><canvas id="chartModelGanho"></canvas></div>
+                <div style="position:relative;height:180px;width:100%"><canvas id="chartModelGanho"></canvas></div>
                 <div style="display:flex;justify-content:center;gap:12px;margin-top:8px;font-size:11px;color:var(--text3)">
                   <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#FAD4B8;display:inline-block"></span>Ganho Liquido</span>
                   <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#D4580A;display:inline-block"></span>IR Total Pago</span>
@@ -438,7 +438,7 @@ label{display:block;margin-bottom:5px;font-size:11px;font-weight:700;color:#888;
               </span>
             </div>
           </div>
-          <div style="position:relative;height:220px"><canvas id="chartModelBreakeven"></canvas></div>
+          <div style="position:relative;height:220px;width:100%"><canvas id="chartModelBreakeven"></canvas></div>
           <div style="font-size:11px;color:var(--text3);margin-top:8px;font-style:italic" id="m-breakeven-legenda">
             Evolução mês a mês dos dois montantes líquidos. O ponto de cruzamento é o breakeven.
           </div>
@@ -647,7 +647,8 @@ function modelCalc() {
 
   var ctxM = document.getElementById('chartModelMont');
   if(ctxM){
-    _chartModel = new Chart(ctxM, {
+    if(_chartModel){ _chartModel.destroy(); _chartModel=null; }
+  _chartModel = new Chart(ctxM, {
       type: 'bar',
       data: {
         labels: ['A+Reinvest.', 'Opcao B'],
@@ -716,7 +717,7 @@ function modelCalc() {
     });
   }
   // Atualiza análise de sensibilidade
-  setTimeout(function(){ modelCalcSensibilidade(); }, 50);
+  setTimeout(function(){ modelCalcSensibilidade(); }, 200);
 }
 
 // ── MODELAGEM: EXPORTACAO ─────────────────────────────────────────────────
@@ -1138,7 +1139,13 @@ function modelCalcSensibilidade() {
   }
 }
 
-window.onload = function(){ modelCalc(); };
+window.onload = function(){
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      modelCalc();
+    });
+  });
+};
 </script>
 </body>
 </html
