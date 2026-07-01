@@ -914,22 +914,46 @@ function exportarExcel() {
   const cdbDr   = dailyRate(cdbAnn);
   const compDr  = dailyRate(compAnn);
 
-  // ── AUTOFIT: calcula largura mínima de cada coluna pelo conteúdo
+  // ── AUTOFIT: calcula largura de cada coluna pelo conteúdo JÁ FORMATADO
+  // (moeda, percentual etc), não pelo valor bruto. Colunas espaçadoras
+  // (sem nenhum conteúdo em nenhuma linha) ficam finas de propósito.
+  function displayLength(cell) {
+    if (!cell || cell.v == null || cell.v === '') return 0;
+    const val = cell.v;
+    if (typeof val === 'number' && cell.s && cell.s.numFmt) {
+      const nf = cell.s.numFmt;
+      if (nf === fmtBRL) {
+        return ('R$ ' + val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })).length;
+      }
+      if (nf === fmtPct) {
+        return ((val * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%').length;
+      }
+      if (nf === fmtPct4) {
+        return ((val * 100).toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 }) + '%').length;
+      }
+    }
+    return String(val).length;
+  }
+
   function autofit(ws) {
-    const cols = {};
+    const colMax = {};
+    let maxCol = 0;
     Object.keys(ws).forEach(addr => {
       if (addr.startsWith('!')) return;
       const cell = ws[addr];
       const ref  = XLSX.utils.decode_cell(addr);
       const col  = ref.c;
-      const val  = cell.v != null ? String(cell.v) : '';
-      // chars + margem; células de R$ têm prefixo longo
-      const len  = val.startsWith('R$') ? val.length + 2 : val.length + 2;
-      cols[col]  = Math.max(cols[col] || 0, Math.min(len, 40));
+      maxCol = Math.max(maxCol, col);
+      const len = displayLength(cell);
+      if (len > 0) colMax[col] = Math.max(colMax[col] || 0, len);
     });
-    ws['!cols'] = Object.keys(cols)
-      .sort((a,b) => a-b)
-      .reduce((arr, c) => { arr[+c] = { wch: cols[c] }; return arr; }, []);
+    const result = [];
+    for (let c = 0; c <= maxCol; c++) {
+      const len = colMax[c];
+      // colunas sem nenhum conteúdo (espaçadores visuais) ficam finas
+      result[c] = { wch: len ? Math.min(len + 3, 42) : 2 };
+    }
+    ws['!cols'] = result;
   }
 
 
@@ -976,7 +1000,7 @@ function exportarExcel() {
     ws[addr] = { v, t: typeof v === 'number' ? 'n' : 's', s };
   }
 
-  // Row heights & col widths
+  // Row heights
   ws['!rows'] = [];
   for (let i = 0; i < 55; i++) ws['!rows'].push({ hpt: 15 });
   ws['!rows'][1] = { hpt: 7.5 };
@@ -992,18 +1016,6 @@ function exportarExcel() {
   ws['!rows'][14] = { hpt: 25.5 };
   ws['!rows'][15] = { hpt: 19.5 };
   ws['!rows'][16] = { hpt: 18 };
-
-  ws['!cols'] = [
-    { wch: 1.5 },   // A
-    { wch: 29 },    // B — label
-    { wch: 1.5 },   // C — sep
-    { wch: 16.2 },  // D — CDB
-    { wch: 17.8 },  // E — Comp
-    { wch: 1.5 },   // F
-    { wch: 1.5 },   // G
-    { wch: 1.5 },   // H
-    { wch: 1.5 },   // I
-  ];
 
   // ── Linha 2: título Parâmetros
   sc(2, 1, '  Parâmetros de Entrada', style(true, WHITE, MIDNIGHT, 'left'));
@@ -1133,7 +1145,6 @@ function exportarExcel() {
   for (let i = 0; i < 40; i++) ws2['!rows'].push({ hpt: 15 });
   ws2['!rows'][1] = { hpt: 25.5 };
   ws2['!rows'][2] = { hpt: 19.5 };
-  ws2['!cols'] = [{ wch:1.5 },{ wch:8 },{ wch:20 },{ wch:20 },{ wch:20 }];
   ws2['!merges'] = [{ s:{r:1,c:1}, e:{r:1,c:4} }];
 
   function sc2(r, c, v, s) {
