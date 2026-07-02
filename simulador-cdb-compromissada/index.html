@@ -1000,6 +1000,13 @@ function exportarExcel() {
     ws[addr] = { v, t: typeof v === 'number' ? 'n' : 's', s };
   }
 
+  // Célula com fórmula viva no Excel. Guarda também o valor calculado (v)
+  // como cache, pra planilha exibir certo mesmo antes de recalcular.
+  function scf(r, c, formula, cachedValue, s) {
+    const addr = XLSX.utils.encode_cell({ r, c });
+    ws[addr] = { t: typeof cachedValue === 'number' ? 'n' : 's', v: cachedValue, f: formula, s };
+  }
+
   // Row heights
   ws['!rows'] = [];
   for (let i = 0; i < 55; i++) ws['!rows'].push({ hpt: 15 });
@@ -1032,7 +1039,7 @@ function exportarExcel() {
   sc(4, 1, 'Valor Investido (R$)', style(false,'FF0D1B2A', null,       'left'));
   sc(4, 2, '',                     style(false, WHITE,     null,       'center'));
   sc(4, 3, inv,                    style(true,  'FF1E3A5F',null,       'center', fmtBRL));
-  sc(4, 4, inv,                    style(false, AMBER,     AMBER_FILL, 'center', fmtBRL));
+  scf(4, 4, 'D4', inv,              style(false, AMBER,     AMBER_FILL, 'center', fmtBRL));
   ws['!merges'].push({ s:{r:4,c:3}, e:{r:4,c:4} }); // D4:E4 — visual only
 
   // ── Linha 5: CDI Anual
@@ -1053,16 +1060,16 @@ function exportarExcel() {
   // ── Linha 8: Taxa Anual
   sc(8, 1, 'Taxa Anual Efetiva (%)', style(false,'FF0D1B2A', null,       'left'));
   sc(8, 2, '',                       style(false, WHITE,     null,       'center'));
-  sc(8, 3, cdbAnn/100,               style(true,  'FF1E3A5F',NAVY_FILL, 'right', fmtPct4));
-  sc(8, 4, compAnn/100,              style(true,  AMBER,     AMBER_FILL,'right', fmtPct4));
+  scf(8, 3, 'D5*D6', cdbAnn/100,     style(true,  'FF1E3A5F',NAVY_FILL, 'right', fmtPct4));
+  scf(8, 4, 'E5*E6', compAnn/100,    style(true,  AMBER,     AMBER_FILL,'right', fmtPct4));
 
   // ── Linha 9: Taxa Diária
   const cdbDrVal  = Math.pow(1 + cdbAnn/100,  1/252) - 1;
   const compDrVal = Math.pow(1 + compAnn/100, 1/252) - 1;
   sc(9, 1, 'Taxa Diária',  style(false,'FF0D1B2A', null,       'left'));
   sc(9, 2, '',             style(false, WHITE,     null,       'center'));
-  sc(9, 3, cdbDrVal,       style(true,  'FF1E3A5F',NAVY_FILL, 'right', fmtPct4));
-  sc(9, 4, compDrVal,      style(true,  AMBER,     AMBER_FILL,'right', fmtPct4));
+  scf(9, 3, '(1+D8)^(1/252)-1', cdbDrVal,  style(true,  'FF1E3A5F',NAVY_FILL, 'right', fmtPct4));
+  scf(9, 4, '(1+E8)^(1/252)-1', compDrVal, style(true,  AMBER,     AMBER_FILL,'right', fmtPct4));
 
   // ── Linhas 10–13: espaçadores
   for (let r = 10; r <= 13; r++)
@@ -1095,7 +1102,13 @@ function exportarExcel() {
   sc(16, 7, '',            style(false,'FF0D1B2A',    CLOUD, 'center'));
   sc(16, 8, 'Vencedor',    style(true, 'FF0D1B2A',   CLOUD, 'center'));
 
-  // ── Linhas 17–51: dados dias 1–35
+  // ── Linhas 17–51: dados dias 1–35, agora com fórmulas vivas no Excel
+  // IOF e IR entram como IF/LOOKUP embutidos, usando a mesma tabela do simulador
+  const iofDaysArr = IOF_TABLE.map((_, i) => i + 1).join(',');
+  const iofPctArr  = IOF_TABLE.map(v => (v / 100).toFixed(2)).join(',');
+  const iofExcel   = (dayRef) => `IF(${dayRef}>=30,0,LOOKUP(${dayRef},{${iofDaysArr}},{${iofPctArr}}))`;
+  const irExcel    = (dayRef) => `IF(${dayRef}<=180,0.225,IF(${dayRef}<=360,0.2,IF(${dayRef}<=720,0.175,0.15)))`;
+
   let cdbAmt = inv, compAmt = inv;
   for (let i = 0; i < 35; i++) {
     const row  = 17 + i;
@@ -1112,23 +1125,29 @@ function exportarExcel() {
     const diff      = cdbLiq - compLiq;
     const isIof     = iofPct > 0;
     const dayColor  = isIof ? IOF_RED : MUTED;
+    const dayRef    = `B${row}`;
 
     sc(row, 1, day,      style(isIof, dayColor,    null,       'center'));
     sc(row, 2, '',       style(false, WHITE,        null,       'center'));
-    sc(row, 3, +cdbBruto.toFixed(2),  style(false, isIof ? IOF_RED : 'FF1E3A5F', null, 'right', fmtBRL));
-    sc(row, 4, +cdbLiq.toFixed(2),    style(true,  isIof ? IOF_RED : 'FF1E3A5F', isIof ? null : NAVY_FILL, 'right', fmtBRL));
-    sc(row, 5, +compBruto.toFixed(2), style(false, AMBER,     null,       'right', fmtBRL));
-    sc(row, 6, +compLiq.toFixed(2),   style(true,  AMBER,     AMBER_FILL, 'right', fmtBRL));
+    scf(row, 3, `$D$4*(1+$D$9)^${dayRef}-$D$4`, +cdbBruto.toFixed(2),
+        style(false, isIof ? IOF_RED : 'FF1E3A5F', null, 'right', fmtBRL));
+    scf(row, 4, `(D${row}-D${row}*(${iofExcel(dayRef)}))*(1-(${irExcel(dayRef)}))`, +cdbLiq.toFixed(2),
+        style(true,  isIof ? IOF_RED : 'FF1E3A5F', isIof ? null : NAVY_FILL, 'right', fmtBRL));
+    scf(row, 5, `$E$4*(1+$E$9)^${dayRef}-$E$4`, +compBruto.toFixed(2),
+        style(false, AMBER,     null,       'right', fmtBRL));
+    scf(row, 6, `F${row}*(1-(${irExcel(dayRef)}))`, +compLiq.toFixed(2),
+        style(true,  AMBER,     AMBER_FILL, 'right', fmtBRL));
     sc(row, 7, '',       style(false, WHITE, null, 'center'));
     const winner = diff > 0 ? 'CDB' : diff < 0 ? 'Compromissada' : 'Empate';
-    sc(row, 8, winner,   style(true,  'FF1E3A5F', null, 'center'));
+    scf(row, 8, `IF(E${row}>G${row},"CDB",IF(E${row}<G${row},"Compromissada","Empate"))`, winner,
+        style(true,  'FF1E3A5F', null, 'center'));
   }
 
   // ── Linha 52: espaçador
   for (let c = 1; c <= 8; c++) sc(52, c, '', style(false, WHITE, null, 'center'));
 
   // ── Linha 53: nota rodapé
-  sc(53, 1, 'Simulação para fins educacionais · ContaComNico · Lab Financeiro · IOF tabela regressiva (D1–D29) · IR regressivo automático',
+  sc(53, 1, 'Simulação para fins educacionais · ContaComNico · Lab Financeiro · Células com fórmula viva: altere CDI, % do CDI ou valor investido e a planilha recalcula',
      { font: { name:'Poppins', italic:true, sz:9, color:{ rgb: MUTED } },
        alignment: { horizontal:'left', vertical:'center' } });
 
@@ -1151,6 +1170,11 @@ function exportarExcel() {
     ws2[XLSX.utils.encode_cell({ r, c })] = { v, t: typeof v==='number'?'n':'s', s };
   }
 
+  // Célula com fórmula viva, ligando esta aba direto na aba Análise
+  function scf2(r, c, formula, cachedValue, s) {
+    ws2[XLSX.utils.encode_cell({ r, c })] = { t: typeof cachedValue==='number'?'n':'s', v: cachedValue, f: formula, s };
+  }
+
   sc2(1, 1, '  Rendimento Líquido — CDB × Compromissada · Dia a Dia', style(true, WHITE, MIDNIGHT, 'left'));
   for (let c = 2; c <= 4; c++) sc2(1, c, '', style(false, WHITE, MIDNIGHT, 'center'));
 
@@ -1159,11 +1183,12 @@ function exportarExcel() {
   sc2(2, 3, 'Rend. Líq. Compromissada (R$)',style(true, WHITE,      AMBER, 'center'));
   sc2(2, 4, 'Diferença (R$)',               style(true, 'FF0D1B2A', CLOUD, 'center'));
 
-  // Recalcular para a aba de curva
+  // Aba de curva agora só referencia a aba Análise, sem recalcular nada por conta própria
   let cdbA2 = inv, compA2 = inv;
   for (let i = 0; i < 35; i++) {
-    const row   = 3 + i;
-    const day   = i + 1;
+    const row    = 3 + i;
+    const day    = i + 1;
+    const anaRow = 17 + i; // linha correspondente na aba Análise
     cdbA2  *= (1 + cdbDr);
     compA2 *= (1 + compDr);
     const cdbBruto  = cdbA2  - inv;
@@ -1176,9 +1201,9 @@ function exportarExcel() {
     const isIof   = iofPct > 0;
     const dColor  = isIof ? IOF_RED : MUTED;
     sc2(row, 1, day,                  style(isIof, dColor,    null,       'center'));
-    sc2(row, 2, +cdbLiq.toFixed(2),   style(false, 'FF1E3A5F',null,       'right', fmtBRL));
-    sc2(row, 3, +compLiq.toFixed(2),  style(false, AMBER,     AMBER_FILL, 'right', fmtBRL));
-    sc2(row, 4, +diff.toFixed(2),     style(true,  isIof ? IOF_RED : 'FF1E3A5F', null, 'right', fmtBRL));
+    scf2(row, 2, `'Análise'!E${anaRow}`, +cdbLiq.toFixed(2),  style(false, 'FF1E3A5F',null,       'right', fmtBRL));
+    scf2(row, 3, `'Análise'!G${anaRow}`, +compLiq.toFixed(2), style(false, AMBER,     AMBER_FILL, 'right', fmtBRL));
+    scf2(row, 4, `C${row}-D${row}`,      +diff.toFixed(2),    style(true,  isIof ? IOF_RED : 'FF1E3A5F', null, 'right', fmtBRL));
   }
 
   ws2['!ref'] = XLSX.utils.encode_range({ s:{r:1,c:1}, e:{r:37,c:4} });
